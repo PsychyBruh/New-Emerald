@@ -10,7 +10,7 @@ import { uvPath } from "@titaniumnetwork-dev/ultraviolet";
 import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
 
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
-// https://vitejs.dev/config/
+
 export default defineConfig({
   plugins: [
     react(),
@@ -53,17 +53,20 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/": {
-        target: "http://localhosT:3000/",
+        target: "http://localhost:3000/",
       },
       "/w/": {
-        target: "http://localhosT:3000/",
+        target: "http://localhost:3000/",
         rewrite: (p) => p.replace(/^\/w/, ""),
         ws: true,
       },
       "/cdn/": {
-        target: "http://localhosT:8000/",
+        target: "http://localhost:3000/",
         rewrite: (p) => p.replace(/^\/cdn/, ""),
       },
     },
+    allowedHosts: [
+      "new--emerald--6wxkd2gfjy86.code.run",
+    ],
   },
 });
