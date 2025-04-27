@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Freek",
+    "url": "https://freek.to/",
+    "icon": "/logos/freek.png"
+  },
+  {
+    "name": "Discord",
+    "url": "https://discord.com/",
+    "icon": "/logos/discord.svg"
+  },
+  {
+    "name": "Hianime",
+    "url": "https://hianime.to",
+    "icon": "/logos/hianime.png"
+  },
+  {
+    "name": "Phantom games",
+    "url": "https://phantom.delusionz.xyz",
+    "icon": "/logos/phantom.png"
+  }
+]
