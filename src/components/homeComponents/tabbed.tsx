@@ -556,7 +556,7 @@ const SettingsPage = () => {
                         and Tailwind CSS.
                       </p>
                       <div className="text-sm text-muted-foreground">
-                        Created with ❤️ by illusions
+                        Created with ❤️ by psychy
                       </div>
                       <data className="text-sm text-muted-foreground">
                         This project uses <Obfuscate text="Scramjet" /> created
@@ -1225,7 +1225,7 @@ const TabbedHome = () => {
                       </div>
                     </motion.div>
                   </div>
-                  <a href="https://discord.gg/Dpj8C8SAmH" target="_blank">
+                  <a href="https://discord.com" target="_blank">
                     <img
                       src="/logos/discord.svg"
                       alt="d!sc0rd"

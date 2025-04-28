@@ -82,9 +82,8 @@ function Home() {
             <AlertDialogTitle>Share the Website!</AlertDialogTitle>
             <AlertDialogDescription>
               Not only does this help motivate me to continue working on emerald
-              but it lets your friends in on the fun! If you're scared about the
-              link being blocked we have plenty of more in the{" "}
-              <Obfuscate text="discord" />!
+              but it lets your friends in on the fun! If you have any issues please let me know! 
+              Enjoy the site!
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
