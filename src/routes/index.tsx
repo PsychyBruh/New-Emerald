@@ -22,7 +22,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Obfuscate } from "@/components/obf";
 
 // Lazy-loaded home variants
 const Default = lazy(() => import("@/components/homeComponents/default"));
