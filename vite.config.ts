@@ -61,12 +61,12 @@ export default defineConfig({
         ws: true,
       },
       "/cdn/": {
-        target: "http://localhost:3000/",
+        target: "http://localhost:8000/",
         rewrite: (p) => p.replace(/^\/cdn/, ""),
       },
     },
     allowedHosts: [
-      "new--emerald--6wxkd2gfjy86.code.run",
+      "*", // Allow any host
     ],
   },
 });
