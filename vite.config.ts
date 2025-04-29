@@ -53,15 +53,15 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/": {
-        target: "http://localhost:3000/emerald/",
+        target: "http://localhost:3000/",
       },
       "/w/": {
-        target: "http://localhost:3000/emerald/",
+        target: "http://localhost:3000/",
         rewrite: (p) => p.replace(/^\/w/, ""),
         ws: true,
       },
       "/cdn/": {
-        target: "http://localhost:3000/emerald/",
+        target: "http://localhost:3000/",
         rewrite: (p) => p.replace(/^\/cdn/, ""),
       },
     },
