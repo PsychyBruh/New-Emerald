@@ -8,11 +8,10 @@ import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
 import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { uvPath } from "@titaniumnetwork-dev/ultraviolet";
 import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
+
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
 export default defineConfig({
-  base: "/emerald/",      // ← ensures all asset URLs are prefixed with /emerald/
-
   plugins: [
     react(),
     TanStackRouterVite(),
@@ -46,13 +45,11 @@ export default defineConfig({
       ],
     }),
   ],
-
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
-
   server: {
     proxy: {
       "/api/": {
@@ -70,13 +67,8 @@ export default defineConfig({
     },
     allowedHosts: [
       "*", // Allow any host
-      "psychy.tail2c9bfb.ts.net",
+      "psychy.tail2c9bfb.ts.net", // Explicitly allow ngrok host
     ],
-    strictPort: false,
-  },
-
-  build: {
-    outDir: "dist",       // production build directory
-    emptyOutDir: true,
+    strictPort: false, // Allow ngrok to bind dynamically to a free port
   },
 });
