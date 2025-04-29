@@ -8,10 +8,10 @@ import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
 import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { uvPath } from "@titaniumnetwork-dev/ultraviolet";
 import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
+
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
 export default defineConfig({
-  base: "/emerald/", // ✅ Set base path so assets load correctly when served under /emerald
   plugins: [
     react(),
     TanStackRouterVite(),
@@ -53,22 +53,22 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/": {
-        target: "http://localhost:3000/",
+        target: "http://localhost:3000/emerald/",
       },
       "/w/": {
-        target: "http://localhost:3000/",
+        target: "http://localhost:3000/emerald/",
         rewrite: (p) => p.replace(/^\/w/, ""),
         ws: true,
       },
       "/cdn/": {
-        target: "http://localhost:3000/",
+        target: "http://localhost:3000/emerald/",
         rewrite: (p) => p.replace(/^\/cdn/, ""),
       },
     },
     allowedHosts: [
-      "*",
-      "psychy.tail2c9bfb.ts.net",
+      "*", // Allow any host
+      "psychy.tail2c9bfb.ts.net", // Explicitly allow ngrok host
     ],
-    strictPort: false,
+    strictPort: false, // Allow ngrok to bind dynamically to a free port
   },
 });
