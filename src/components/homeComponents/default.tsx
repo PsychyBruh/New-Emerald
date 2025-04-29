@@ -475,7 +475,7 @@ const DefaultHome = () => {
                 src="/discordDock.svg"
                 className="w-6 h-6 transition-all"
                 onClick={() =>
-                  window.open("https://discord.gg/Dpj8C8SAm", "_blank")
+                  window.open("https://discord.com", "_blank")
                 }
                 alt={"Discord Logo"}
               />
