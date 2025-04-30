@@ -74,10 +74,10 @@ const defaultBookmarks: Bookmark[] = [
     color: "#FF0000",
   },
   {
-    id: "github",
-    title: "GitHub",
-    url: "https://github.com",
-    favicon: "/logos/github.svg",
+    id: "movie",
+    title: "Free Movies",
+    url: "https://fawesome.tv/home/",
+    favicon: "/logos/freek.png",
     color: "#24292e",
   },
   {
