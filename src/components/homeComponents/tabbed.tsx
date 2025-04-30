@@ -76,7 +76,7 @@ const defaultBookmarks: Bookmark[] = [
   {
     id: "movie",
     title: "Free Movies",
-    url: "https://fawesome.tv/home/",
+    url: "https://flixbaba.net/",
     favicon: "/logos/freek.png",
     color: "#24292e",
   },
@@ -88,10 +88,24 @@ const defaultBookmarks: Bookmark[] = [
     color: "#1DA1F2",
   },
   {
-    id: "reddit",
-    title: "Reddit",
-    url: "https://www.reddit.com",
-    favicon: "/logos/reddit.svg",
+    id: "poki",
+    title: "poki",
+    url: "https://poki.com/",
+    favicon: "/logos/poki.png",
+    color: "#FF4500",
+  },
+  {
+    id: "hianime",
+    title: "Hianime",
+    url: "https://hianime.to/",
+    favicon: "/logos/hianime.png",
+    color: "#FF4500",
+  },
+  {
+    id: "9anime",
+    title: "9anime",
+    url: "https://9animetv.to/",
+    favicon: "/logos/9anime.jpg",
     color: "#FF4500",
   },
 ];
