@@ -598,7 +598,7 @@ const SettingsPage = () => {
                         <Checkbox
                           id="allow-tab-reordering"
                           checked={settingsStore.allowTabReordering}
-                          onCheckedChange={(checked) => {
+                          onCheckedChange={(checked: boolean) => {
                             settingsStore.setAllowTabReordering(
                               checked === true
                             );
