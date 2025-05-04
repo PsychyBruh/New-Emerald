@@ -12,7 +12,6 @@ import {
 import { motion } from "framer-motion";
 import GridPattern from "../ui/grid-pattern";
 import { cn } from "@/lib/utils";
-import posthog from "posthog-js";
 const OnBoarding = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const settings = useSettings();
@@ -25,9 +24,6 @@ const OnBoarding = () => {
   }, []);
 
   const handleSiteTypeSelection = (siteType: "default" | "browser") => {
-    posthog.capture("onboarding", {
-      style: siteType,
-    });
     settings.setSiteType(siteType);
     localStorage.setItem("onboardingCompleted", "true");
     setShowOnboarding(false);
@@ -107,7 +103,7 @@ const OnBoarding = () => {
                 onClick={() => handleSiteTypeSelection("browser")}
               >
                 <CardHeader>
-                  <CardTitle>Browser Mode</CardTitle>
+                  <CardTitle>Browser Mode (Recommended)</CardTitle>
                   <CardDescription>
                     Full browser experience with tabs and advanced features
                   </CardDescription>

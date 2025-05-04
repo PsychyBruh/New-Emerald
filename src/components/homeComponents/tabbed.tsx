@@ -12,6 +12,7 @@ import {
   Home,
   Bookmark,
 } from "lucide-react";
+import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
 import GridPattern from "../ui/grid-pattern";
 import { Input } from "../ui/input";
@@ -35,6 +36,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Obfuscate } from "../obf";
+import { VERSION } from "@/constants";
 interface Tab {
   id: string;
   title: string;
@@ -106,6 +108,13 @@ const defaultBookmarks: Bookmark[] = [
     title: "9anime",
     url: "https://9animetv.to/",
     favicon: "/logos/9anime.jpg",
+    color: "#FF4500",
+  },
+  {
+    id: "spotify",
+    title: "Spotify",
+    url: "https://open.spotify.com/",
+    favicon: "/logos/spotify.svg",
     color: "#FF4500",
   },
 ];
@@ -258,6 +267,38 @@ const SettingsPage = () => {
                         </Select>
                         <p className="text-sm text-muted-foreground mt-2 ml-8">
                           The main look of Emerald that YOU can change
+                        </p>
+                      </div>
+
+                      <Separator className="bg-border/20" />
+
+                      <div>
+                        <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                          <span className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            4
+                          </span>
+                          Cloaking
+                        </h3>
+                        <Select
+                          value={settingsStore.cloak}
+                          onValueChange={(value) =>
+                            settingsStore.setCloak(
+                              value as "none" | "aboutBlank"
+                            )
+                          }
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select cloaking method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="aboutBlank">
+                              About:Blank
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-sm text-muted-foreground mt-2 ml-8">
+                          Hide Emerald using cloaking methods
                         </p>
                       </div>
                     </CardContent>
@@ -511,6 +552,75 @@ const SettingsPage = () => {
                         browsing
                       </p>
                     </div>
+
+                    <Separator className="bg-border/20" />
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                        <span className="h-6 w-6 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
+                          2
+                        </span>
+                        Tab Features
+                        <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-800/30">
+                          Experimental
+                        </span>
+                      </h3>
+                      {/**
+                       * TODO: fix styling for this bcs i really like it but its prettty ugly
+                       */}
+                      {/* <div className="mb-4 p-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30 rounded-lg text-amber-800 dark:text-amber-500 text-sm flex items-start gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-5 w-5 mt-0.5 flex-shrink-0"
+                        >
+                          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                          <line x1="12" y1="9" x2="12" y2="13"></line>
+                          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <div>
+                          <p className="font-medium">Experimental Feature</p>
+                          <p className="mt-1">
+                            These features are still in development and may
+                            cause unexpected behavior. Use with caution.
+                          </p>
+                        </div>
+                      </div> */}
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="allow-tab-reordering"
+                          checked={settingsStore.allowTabReordering}
+                          onCheckedChange={(checked) => {
+                            settingsStore.setAllowTabReordering(
+                              checked === true
+                            );
+                            toast.success(
+                              `Tab reordering ${checked ? "enabled" : "disabled"}`
+                            );
+                          }}
+                        />
+                        <label
+                          htmlFor="allow-tab-reordering"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Allow tab reordering
+                        </label>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2 ml-8">
+                        Enable or disable the ability to reorder tabs by
+                        dragging them
+                      </p>
+                    </div>
+
+                    <Separator className="bg-border/20" />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -563,14 +673,14 @@ const SettingsPage = () => {
                         Emerald Modern
                       </h3>
                       <p className="text-sm text-muted-foreground mb-4">
-                        Version 1.0.0
+                        Version {VERSION}
                       </p>
                       <p className="text-sm text-center max-w-md mb-6">
                         A modern, sleek web browser interface built with React
                         and Tailwind CSS.
                       </p>
                       <div className="text-sm text-muted-foreground">
-                        Created with ❤️ by psychy
+                        Created with ❤️ by illusions
                       </div>
                       <data className="text-sm text-muted-foreground">
                         This project uses <Obfuscate text="Scramjet" /> created
@@ -738,7 +848,7 @@ const TabbedHome = () => {
     }
 
     setTabs(newTabs);
-    delete iframeRefs.current[id];
+    // delete iframeRefs.current[id];
   };
 
   const activateTab = (id: string) => {
@@ -834,6 +944,8 @@ const TabbedHome = () => {
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
+    if (!settingsStore.allowTabReordering) return;
+
     setDraggedTabId(id);
     // Set a transparent drag image
     const img = new Image();
@@ -844,7 +956,12 @@ const TabbedHome = () => {
 
   const handleDragOver = (e: React.DragEvent, id: string) => {
     e.preventDefault();
-    if (!draggedTabId || draggedTabId === id) return;
+    if (
+      !settingsStore.allowTabReordering ||
+      !draggedTabId ||
+      draggedTabId === id
+    )
+      return;
 
     const draggedTabIndex = tabs.findIndex((tab) => tab.id === draggedTabId);
     const targetTabIndex = tabs.findIndex((tab) => tab.id === id);
@@ -996,8 +1113,10 @@ const TabbedHome = () => {
               data-tab-id={tab.id}
               onClick={() => activateTab(tab.id)}
               draggable
-              // @ts-expect-error blerb
-              onDragStart={(e) => handleDragStart(e, tab.id)}
+              onDragStart={(e) =>
+                // @ts-expect-error blerb
+                settingsStore.allowTabReordering && handleDragStart(e, tab.id)
+              }
               onDragOver={(e) => handleDragOver(e, tab.id)}
               onDragEnd={handleDragEnd}
               className={cn(
@@ -1239,7 +1358,7 @@ const TabbedHome = () => {
                       </div>
                     </motion.div>
                   </div>
-                  <a href="https://discord.com" target="_blank">
+                  <a href="https://discord.gg/Dpj8C8SAmH" target="_blank">
                     <img
                       src="/logos/discord.svg"
                       alt="d!sc0rd"
