@@ -45,7 +45,7 @@ const DEFAULT_SETTINGS: SettingValues = {
     name: "libcurl",
   },
   allowTabReordering: false,
-  cloak: "aboutBlank",
+  cloak: "none",
   siteType: "browser",
   title: "Emerald ✨",
   icon: "/emerald.png",
