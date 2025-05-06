@@ -117,6 +117,13 @@ const defaultBookmarks: Bookmark[] = [
     favicon: "/logos/spotify.svg",
     color: "#FF4500",
   },
+  {
+    id: "roblox",
+    title: "Roblox",
+    url: "https://www.easyfun.gg/cloud-games/roblox.html",
+    favicon: "/logos/roblox.png",
+    color: "#FF4500",
+  },
 ];
 
 const BookmarkItem = ({
