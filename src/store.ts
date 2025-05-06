@@ -39,19 +39,19 @@ interface SettingSetters {
 
 const DEFAULT_SETTINGS: SettingValues = {
   version: "1.0.0",
-  proxy: "scramjet",
+  proxy: "uv",
   transport: {
     path: "/libcurl/index.mjs",
     name: "libcurl",
   },
   allowTabReordering: false,
-  cloak: "none",
+  cloak: "aboutBlank",
   siteType: "browser",
   title: "Emerald ✨",
   icon: "/emerald.png",
   searchEngine: {
-    name: "Brave",
-    url: "https://search.brave.com/search?q=",
+    name: "Google",
+    url: "https://google.com/search?q=",
   },
   wispUrl: `${location.protocol.includes("https") ? "wss://" : "ws://"}${
     location.host
