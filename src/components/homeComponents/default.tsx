@@ -210,14 +210,15 @@ const DefaultHome = () => {
         ref={frame}
         className={`w-full h-screen ${shouldOpen ? "" : "hidden"} z-20`}
       ></iframe>
-      <AdBanner
-        placement={ADMAVEN_DEFAULT_PLACEMENT}
-        funnelUrl={"https://otieu.com/4/10128848"}
-        className={cn(
-          "fixed left-4 top-1/2 z-[60] hidden h-[600px] w-40 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg transition-opacity duration-300 lg:flex",
-          shouldOpen && "opacity-0 pointer-events-none"
-        )}
-      />
+      {!shouldOpen && (
+        <AdBanner
+          placement={ADMAVEN_DEFAULT_PLACEMENT}
+          funnelUrl={"https://otieu.com/4/10128848"}
+          className={cn(
+            "fixed left-4 top-1/2 z-[60] hidden h-[600px] w-40 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg transition-opacity duration-300 lg:flex"
+          )}
+        />
+      )}
       <div
         className={`w-full min-h-screen flex items-center justify-center z-20 ${
           shouldOpen ? "hidden" : ""

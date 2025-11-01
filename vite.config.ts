@@ -50,6 +50,35 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    sourcemap: false,
+    cssCodeSplit: true,
+    minify: "esbuild",
+    reportCompressedSize: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          router: ["@tanstack/react-router", "@tanstack/router-devtools"],
+          motion: ["framer-motion"],
+          ga: ["react-ga4"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1500,
+  },
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "@tanstack/react-router",
+      "framer-motion",
+      "react-ga4",
+    ],
+    esbuildOptions: {
+      target: "es2020",
+    },
+  },
   server: {
     proxy: {
       "/api/": {

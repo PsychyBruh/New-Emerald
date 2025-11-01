@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 declare global {
@@ -19,6 +19,9 @@ type AdBannerProps = {
   className?: string;
   refreshInterval?: number;
   funnelUrl?: string; // raw target URL to funnel via UV
+  lazy?: boolean; // only render when visible
+  unmountWhenHidden?: boolean; // free resources when off-screen
+  rootMargin?: string; // IO rootMargin, e.g., "200px"
 };
 
 const AdBanner = ({
@@ -26,9 +29,14 @@ const AdBanner = ({
   className,
   refreshInterval = AD_REFRESH_INTERVAL,
   funnelUrl,
+  lazy = true,
+  unmountWhenHidden = true,
+  rootMargin = "150px",
 }: AdBannerProps) => {
   const [refreshKey, setRefreshKey] = useState(() => Date.now());
   const [uvLink, setUvLink] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState(!lazy);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Disable periodic refresh: only render once per mount/placement change
   useEffect(() => {
@@ -68,23 +76,63 @@ const AdBanner = ({
     } catch {}
   }, [placement]);
 
+  // IntersectionObserver to lazily mount/unmount heavy content
+  useEffect(() => {
+    if (!lazy) return;
+    if (typeof window === "undefined") return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    let rafId: number | null = null;
+    const onVisible = (visible: boolean) => {
+      if (!unmountWhenHidden && !visible) return; // keep mounted
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => setIsActive(visible));
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        onVisible(entry.isIntersecting);
+      },
+      { root: null, threshold: 0.05, rootMargin }
+    );
+    io.observe(el);
+
+    // Also pause when page/tab hidden
+    const onVis = () => {
+      if (!document.hidden) return;
+      if (unmountWhenHidden) setIsActive(false);
+    };
+    document.addEventListener("visibilitychange", onVis);
+
+    return () => {
+      io.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [lazy, unmountWhenHidden, rootMargin]);
+
   return (
-    <div className={cn("relative overflow-hidden", className)}>
+    <div ref={containerRef as any} className={cn("relative overflow-hidden", className)}>
       <div className="absolute inset-0 w-full h-full">
         {uvLink ? (
-          <iframe
-            src={uvLink}
-            className="w-full h-full border-0"
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation allow-top-navigation-by-user-activation"
-            title="Sponsored via Ultraviolet"
-          />
-        ) : (
+          isActive ? (
+            <iframe
+              src={uvLink}
+              className="w-full h-full border-0"
+              loading="lazy"
+              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation allow-top-navigation-by-user-activation"
+              title="Sponsored via Ultraviolet"
+            />
+          ) : null
+        ) : isActive ? (
           <div
             key={refreshKey}
             className="w-full h-full"
             data-admaven-placement={placement}
           />
-        )}
+        ) : null}
       </div>
     </div>
   );
