@@ -11,7 +11,8 @@ declare global {
   }
 }
 
-export const AD_REFRESH_INTERVAL = 35_000;
+// Auto-refresh disabled per request
+export const AD_REFRESH_INTERVAL = 0;
 
 type AdBannerProps = {
   placement: string;
@@ -26,16 +27,9 @@ const AdBanner = ({
 }: AdBannerProps) => {
   const [refreshKey, setRefreshKey] = useState(() => Date.now());
 
+  // Disable periodic refresh: only render once per mount/placement change
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setRefreshKey(Date.now());
-    }, refreshInterval);
-
-    return () => window.clearInterval(intervalId);
+    // no-op: intentionally not setting an interval
   }, [refreshInterval]);
 
   useEffect(() => {
@@ -43,24 +37,17 @@ const AdBanner = ({
   }, [placement]);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
+    if (typeof window === "undefined") return;
     const admaven = window.admaven;
     if (!admaven) return;
     try {
       if (typeof admaven.render === "function") {
         admaven.render();
-      } else if (typeof admaven.refresh === "function") {
-        admaven.refresh();
       } else if (typeof admaven.push === "function") {
         admaven.push({ event: "render" });
       }
-    } catch (error) {
-      console.warn("Ad refresh failed", error);
-    }
-  }, [refreshKey]);
+    } catch {}
+  }, [placement]);
 
   return (
     <div className={cn("relative flex items-center justify-center", className)}>
