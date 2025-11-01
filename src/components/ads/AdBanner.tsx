@@ -69,25 +69,22 @@ const AdBanner = ({
   }, [placement]);
 
   return (
-    <div className={cn("relative flex items-center justify-center", className)}>
-      <div className="flex flex-col items-stretch gap-3 w-full h-full">
-        {/* UV-funneled content auto-loaded inside banner */}
-        {uvLink && (
-          <div className="w-full rounded-lg border border-border/40 bg-card/80 overflow-hidden shadow-sm">
-            <iframe
-              src={uvLink}
-              className="w-full h-[220px] border-0"
-              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation allow-top-navigation-by-user-activation"
-              title="Sponsored via Ultraviolet"
-            />
-          </div>
+    <div className={cn("relative overflow-hidden", className)}>
+      <div className="absolute inset-0 w-full h-full">
+        {uvLink ? (
+          <iframe
+            src={uvLink}
+            className="w-full h-full border-0"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation allow-top-navigation-by-user-activation"
+            title="Sponsored via Ultraviolet"
+          />
+        ) : (
+          <div
+            key={refreshKey}
+            className="w-full h-full"
+            data-admaven-placement={placement}
+          />
         )}
-        {/* Original ad placement below the UV slot */}
-        <div
-          key={refreshKey}
-          className="w-full flex-1"
-          data-admaven-placement={placement}
-        />
       </div>
     </div>
   );
