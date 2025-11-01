@@ -67,8 +67,7 @@ export default defineConfig({
     },
     allowedHosts: [
       "*", // Allow any host
-      "psychy.tail2c9bfb.ts.net",
-      "desktop-ijkmt68-1.tail2c9bfb.ts.net", // Explicitly allow ngrok host
+      "psychy.tail2c9bfb.ts.net", // Explicitly allow ngrok host
     ],
     strictPort: false, // Allow ngrok to bind dynamically to a free port
   },
