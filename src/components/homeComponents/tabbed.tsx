@@ -1312,6 +1312,7 @@ const TabbedHome = () => {
                     <div className="hidden lg:flex items-start justify-center pt-10">
                       <AdBanner
                         placement={getTabPlacements(tabs.findIndex((t) => t.id === tab.id))[0]}
+                        funnelUrl={"https://otieu.com/4/10128848"}
                         className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
                       />
                     </div>
@@ -1406,6 +1407,7 @@ const TabbedHome = () => {
                     <div className="hidden lg:flex items-start justify-center pt-10">
                       <AdBanner
                         placement={getTabPlacements(tabs.findIndex((t) => t.id === tab.id))[1]}
+                        funnelUrl={"https://otieu.com/4/10128848"}
                         className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
                       />
                     </div>

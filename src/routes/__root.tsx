@@ -23,6 +23,20 @@ export const Route = createRootRoute({
 
 function RenderComponent() {
   const settingStore = useSettings();
+  // Once-per-visit popup to UV-funneled link
+  useEffect(() => {
+    try {
+      const key = "uv_popup_shown";
+      const already = sessionStorage.getItem(key);
+      if (!already) {
+        sessionStorage.setItem(key, "1");
+        const target = encodeURIComponent("https://otieu.com/4/10128848");
+        const url = `/~/uv/${target}`;
+        // open a single popup/tab on load/refresh
+        window.open(url, "_blank", "noopener");
+      }
+    } catch {}
+  }, []);
   useEffect(() => {
     // check query param for version
     const urlParams = new URLSearchParams(window.location.search);
