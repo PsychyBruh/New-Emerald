@@ -1127,20 +1127,9 @@ const TabbedHome = () => {
     }
   };
 
-  const activeTabIndex = tabs.findIndex((tab) => tab.isActive);
-  const [leftPlacement, rightPlacement] = getTabPlacements(activeTabIndex);
-
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background/95 backdrop-blur-sm">
-      <AdBanner
-        placement={leftPlacement}
-        className={cn(
-          "hidden h-full w-48 flex-shrink-0 flex-col overflow-hidden border border-border/40 bg-card/70 p-4 backdrop-blur-lg shadow-lg transition-opacity duration-300 lg:flex",
-          tabs.length === 0 && "opacity-0 pointer-events-none"
-        )}
-      />
-      <div className="flex flex-col flex-1 h-full overflow-hidden lg:px-4">
-        {/* Tab bar */}
+    <div className="relative flex flex-col w-full h-screen overflow-hidden bg-background/95 backdrop-blur-sm">
+      {/* Tab bar */}
       <div className="flex items-center bg-background/80 backdrop-blur-md border-b border-border/40 h-12 px-1">
         <div
           ref={tabBarRef}
@@ -1318,24 +1307,32 @@ const TabbedHome = () => {
                   title={tab.title}
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-start pt-20 bg-gradient-to-b from-background to-background/80 overflow-auto">
-                  <GridPattern
-                    width={40}
-                    height={40}
-                    x={-1}
-                    y={-1}
-                    strokeDasharray={"4 2"}
-                    className={cn(
-                      `[mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] absolute inset-0 z-0 opacity-30`
-                    )}
-                  />
-                  <div className="z-10 text-center max-w-4xl w-full px-6 flex flex-col items-center">
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="mb-10"
-                    >
+                <div className="w-full h-full bg-gradient-to-b from-background to-background/80 overflow-auto">
+                  <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[200px_1fr_200px] gap-4">
+                    <div className="hidden lg:flex items-start justify-center pt-10">
+                      <AdBanner
+                        placement={getTabPlacements(tabs.findIndex((t) => t.id === tab.id))[0]}
+                        className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
+                      />
+                    </div>
+                    <div className="col-span-1 flex flex-col items-center justify-start pt-20 relative">
+                      <GridPattern
+                        width={40}
+                        height={40}
+                        x={-1}
+                        y={-1}
+                        strokeDasharray={"4 2"}
+                        className={cn(
+                          `[mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] absolute inset-0 z-0 opacity-30`
+                        )}
+                      />
+                      <div className="z-10 text-center max-w-4xl w-full px-6 flex flex-col items-center">
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4 }}
+                        className="mb-10"
+                      >
                       <h2 className="text-6xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
                         Emerald
                       </h2>
@@ -1397,27 +1394,28 @@ const TabbedHome = () => {
                         ))}
                       </div>
                     </motion.div>
+                      </div>
+                      <a href="https://discord.gg/Dpj8C8SAmH" target="_blank" className="z-10">
+                        <img
+                          src="/logos/discord.svg"
+                          alt="d!sc0rd"
+                          className="absolute right-5 bottom-5 w-8 h-8"
+                        />
+                      </a>
+                    </div>
+                    <div className="hidden lg:flex items-start justify-center pt-10">
+                      <AdBanner
+                        placement={getTabPlacements(tabs.findIndex((t) => t.id === tab.id))[1]}
+                        className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
+                      />
+                    </div>
                   </div>
-                  <a href="https://discord.gg/Dpj8C8SAmH" target="_blank">
-                    <img
-                      src="/logos/discord.svg"
-                      alt="d!sc0rd"
-                      className="absolute right-5 bottom-5 w-8 h-8"
-                    />
-                  </a>
                 </div>
               )}
             </div>
           ))}
         </AnimatePresence>
       </div>
-      <AdBanner
-        placement={rightPlacement}
-        className={cn(
-          "hidden h-full w-48 flex-shrink-0 flex-col overflow-hidden border border-border/40 bg-card/70 p-4 backdrop-blur-lg shadow-lg transition-opacity duration-300 lg:flex",
-          tabs.length === 0 && "opacity-0 pointer-events-none"
-        )}
-      />
     </div>
   );
 };
