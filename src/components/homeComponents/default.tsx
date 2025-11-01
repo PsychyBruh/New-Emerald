@@ -14,7 +14,8 @@ import { useMeta } from "../hooks/useMeta";
 import { AnimatePresence, motion } from "framer-motion";
 import GridPattern from "../ui/grid-pattern";
 import PopularSites from "../../sites.json";
-
+import AdBanner from "../ads/AdBanner";
+import { ADMAVEN_DEFAULT_PLACEMENT } from "@/constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -209,6 +210,13 @@ const DefaultHome = () => {
         ref={frame}
         className={`w-full h-screen ${shouldOpen ? "" : "hidden"} z-20`}
       ></iframe>
+      <AdBanner
+        placement={ADMAVEN_DEFAULT_PLACEMENT}
+        className={cn(
+          "fixed left-4 top-1/2 z-[60] hidden h-[600px] w-40 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg transition-opacity duration-300 lg:flex",
+          shouldOpen && "opacity-0 pointer-events-none"
+        )}
+      />
       <div
         className={`w-full min-h-screen flex items-center justify-center z-20 ${
           shouldOpen ? "hidden" : ""

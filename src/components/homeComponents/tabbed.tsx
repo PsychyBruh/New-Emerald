@@ -36,7 +36,12 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Obfuscate } from "../obf";
-import { VERSION } from "@/constants";
+import AdBanner from "../ads/AdBanner";
+import {
+  VERSION,
+  ADMAVEN_DEFAULT_PLACEMENT,
+  ADMAVEN_TAB_PLACEMENTS,
+} from "@/constants";
 interface Tab {
   id: string;
   title: string;
@@ -721,6 +726,23 @@ const TabbedHome = () => {
   const urlInputRef = useRef<HTMLInputElement>(null);
   const settingsStore = useSettings();
 
+  const getTabPlacements = (tabIndex: number): [string, string] => {
+    const pool =
+      ADMAVEN_TAB_PLACEMENTS.length > 0
+        ? ADMAVEN_TAB_PLACEMENTS
+        : [ADMAVEN_DEFAULT_PLACEMENT];
+    const normalizedIndex = tabIndex < 0 ? 0 : tabIndex;
+
+    if (pool.length === 1) {
+      return [pool[0], pool[0]];
+    }
+
+    const left = pool[(normalizedIndex * 2) % pool.length];
+    const right = pool[(normalizedIndex * 2 + 1) % pool.length];
+
+    return [left, right];
+  };
+
   const handleBookmarkClick = (bookmark: Bookmark) => {
     const activeTabIndex = tabs.findIndex((tab) => tab.isActive);
     if (activeTabIndex !== -1) {
@@ -1105,9 +1127,20 @@ const TabbedHome = () => {
     }
   };
 
+  const activeTabIndex = tabs.findIndex((tab) => tab.isActive);
+  const [leftPlacement, rightPlacement] = getTabPlacements(activeTabIndex);
+
   return (
-    <div className="flex flex-col w-full h-screen overflow-hidden bg-background/95 backdrop-blur-sm">
-      {/* Tab bar */}
+    <div className="flex h-screen w-full overflow-hidden bg-background/95 backdrop-blur-sm">
+      <AdBanner
+        placement={leftPlacement}
+        className={cn(
+          "hidden h-full w-48 flex-shrink-0 flex-col overflow-hidden border border-border/40 bg-card/70 p-4 backdrop-blur-lg shadow-lg transition-opacity duration-300 lg:flex",
+          tabs.length === 0 && "opacity-0 pointer-events-none"
+        )}
+      />
+      <div className="flex flex-col flex-1 h-full overflow-hidden lg:px-4">
+        {/* Tab bar */}
       <div className="flex items-center bg-background/80 backdrop-blur-md border-b border-border/40 h-12 px-1">
         <div
           ref={tabBarRef}
@@ -1378,6 +1411,13 @@ const TabbedHome = () => {
           ))}
         </AnimatePresence>
       </div>
+      <AdBanner
+        placement={rightPlacement}
+        className={cn(
+          "hidden h-full w-48 flex-shrink-0 flex-col overflow-hidden border border-border/40 bg-card/70 p-4 backdrop-blur-lg shadow-lg transition-opacity duration-300 lg:flex",
+          tabs.length === 0 && "opacity-0 pointer-events-none"
+        )}
+      />
     </div>
   );
 };
