@@ -71,34 +71,23 @@ const AdBanner = ({
   return (
     <div className={cn("relative flex items-center justify-center", className)}>
       <div className="flex flex-col items-stretch gap-3 w-full h-full">
-        {/* Built-in UV funnel link banner (if provided) */}
+        {/* UV-funneled content auto-loaded inside banner */}
         {uvLink && (
-          <a
-            href={uvLink}
-            target="_self"
-            rel="noopener"
-            className="block text-center text-sm rounded-lg px-3 py-2 border border-border/40 bg-card/80 hover:bg-card transition-colors shadow-sm"
-          >
-            Sponsored: Open via Ultraviolet
-          </a>
+          <div className="w-full rounded-lg border border-border/40 bg-card/80 overflow-hidden shadow-sm">
+            <iframe
+              src={uvLink}
+              className="w-full h-[220px] border-0"
+              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation allow-top-navigation-by-user-activation"
+              title="Sponsored via Ultraviolet"
+            />
+          </div>
         )}
-        {/* Original ad placement */}
+        {/* Original ad placement below the UV slot */}
         <div
           key={refreshKey}
-          className="w-full h-full"
+          className="w-full flex-1"
           data-admaven-placement={placement}
         />
-        {/* Mirror the UV link at the bottom so both show in the banner */}
-        {uvLink && (
-          <a
-            href={uvLink}
-            target="_self"
-            rel="noopener"
-            className="block text-center text-sm rounded-lg px-3 py-2 border border-border/40 bg-card/80 hover:bg-card transition-colors shadow-sm"
-          >
-            Try the link through UV
-          </a>
-        )}
       </div>
     </div>
   );
