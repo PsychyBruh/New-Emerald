@@ -37,11 +37,8 @@ import {
 } from "../ui/select";
 import { Obfuscate } from "../obf";
 import AdBanner from "../ads/AdBanner";
-import {
-  VERSION,
-  ADMAVEN_DEFAULT_PLACEMENT,
-  ADMAVEN_TAB_PLACEMENTS,
-} from "@/constants";
+import { VERSION, SMARTLINK_URL } from "@/constants";
+import { openSupportAdsModal, setAdConsent, getAdConsent } from "@/components/ads/consent";
 interface Tab {
   id: string;
   title: string;
@@ -309,13 +306,48 @@ const SettingsPage = () => {
                             </SelectItem>
                           </SelectContent>
                         </Select>
-                        <p className="text-sm text-muted-foreground mt-2 ml-8">
-                          Hide Emerald using cloaking methods
-                        </p>
+                      <p className="text-sm text-muted-foreground mt-2 ml-8">
+                        Hide Emerald using cloaking methods
+                      </p>
+                    </div>
+
+                    <Separator className="bg-border/20" />
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                        <span className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          5
+                        </span>
+                        Support Ads
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
+                          onClick={() => setAdConsent('granted')}
+                        >
+                          Enable
+                        </button>
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
+                          onClick={() => setAdConsent('denied')}
+                        >
+                          Disable
+                        </button>
+                        <button
+                          className="px-3 py-1 rounded-md text-sm border border-border/40 hover:bg-card/70"
+                          onClick={() => openSupportAdsModal()}
+                          title={`Current: ${getAdConsent() ?? 'unset'}`}
+                        >
+                          Manage
+                        </button>
                       </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                      <p className="text-sm text-muted-foreground mt-2 ml-8">
+                        You can enable or disable sponsored content. Change anytime.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
               </AnimatePresence>
 
               <TabsContent
@@ -726,22 +758,6 @@ const TabbedHome = () => {
   const urlInputRef = useRef<HTMLInputElement>(null);
   const settingsStore = useSettings();
 
-  const getTabPlacements = (tabIndex: number): [string, string] => {
-    const pool =
-      ADMAVEN_TAB_PLACEMENTS.length > 0
-        ? ADMAVEN_TAB_PLACEMENTS
-        : [ADMAVEN_DEFAULT_PLACEMENT];
-    const normalizedIndex = tabIndex < 0 ? 0 : tabIndex;
-
-    if (pool.length === 1) {
-      return [pool[0], pool[0]];
-    }
-
-    const left = pool[(normalizedIndex * 2) % pool.length];
-    const right = pool[(normalizedIndex * 2 + 1) % pool.length];
-
-    return [left, right];
-  };
 
   const handleBookmarkClick = (bookmark: Bookmark) => {
     const activeTabIndex = tabs.findIndex((tab) => tab.isActive);
@@ -1311,8 +1327,7 @@ const TabbedHome = () => {
                   <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[200px_1fr_200px] gap-4">
                     <div className="hidden lg:flex items-start justify-center pt-10">
                       <AdBanner
-                        placement={getTabPlacements(tabs.findIndex((t) => t.id === tab.id))[0]}
-                        funnelUrl={"https://otieu.com/4/10128848"}
+                        smartlinkUrl={SMARTLINK_URL}
                         className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
                       />
                     </div>
@@ -1406,8 +1421,7 @@ const TabbedHome = () => {
                     </div>
                     <div className="hidden lg:flex items-start justify-center pt-10">
                       <AdBanner
-                        placement={getTabPlacements(tabs.findIndex((t) => t.id === tab.id))[1]}
-                        funnelUrl={"https://otieu.com/4/10128848"}
+                        smartlinkUrl={SMARTLINK_URL}
                         className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
                       />
                     </div>

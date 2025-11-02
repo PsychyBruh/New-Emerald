@@ -15,7 +15,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import GridPattern from "../ui/grid-pattern";
 import PopularSites from "../../sites.json";
 import AdBanner from "../ads/AdBanner";
-import { ADMAVEN_DEFAULT_PLACEMENT } from "@/constants";
+import { SMARTLINK_URL } from "@/constants";
+import { openSupportAdsModal, setAdConsent, getAdConsent } from "@/components/ads/consent";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -212,8 +213,7 @@ const DefaultHome = () => {
       ></iframe>
       {!shouldOpen && (
         <AdBanner
-          placement={ADMAVEN_DEFAULT_PLACEMENT}
-          funnelUrl={"https://otieu.com/4/10128848"}
+          smartlinkUrl={SMARTLINK_URL}
           className={cn(
             "fixed left-4 top-1/2 z-[60] hidden h-[600px] w-40 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg transition-opacity duration-300 lg:flex"
           )}
@@ -680,6 +680,30 @@ const DefaultHome = () => {
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="flex justify-between px-4 items-center">
+                  <h3 className="text-xl font-medium">Support Ads</h3>
+                  <div className="w-[40%] flex items-center justify-end space-x-2">
+                    <button
+                      className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
+                      onClick={() => setAdConsent('granted')}
+                    >
+                      Enable
+                    </button>
+                    <button
+                      className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
+                      onClick={() => setAdConsent('denied')}
+                    >
+                      Disable
+                    </button>
+                    <button
+                      className="px-3 py-1 rounded-md text-sm border border-border/40 hover:bg-card/70"
+                      onClick={() => openSupportAdsModal()}
+                      title={`Current: ${getAdConsent() ?? 'unset'}`}
+                    >
+                      Manage
+                    </button>
+                  </div>
                 </div>
                 <div className="flex justify-center px-4 py-4">
                   <Button
