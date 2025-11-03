@@ -11,7 +11,6 @@ type AdBannerProps = {
 const AdBanner = ({ smartlinkUrl = SMARTLINK_URL, className }: AdBannerProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [shouldRender, setShouldRender] = useState(false);
-  const [fallback, setFallback] = useState(false);
   const [frameSrc, setFrameSrc] = useState<string>("");
   const [loaded, setLoaded] = useState(false);
 
@@ -38,35 +37,14 @@ const AdBanner = ({ smartlinkUrl = SMARTLINK_URL, className }: AdBannerProps) =>
     const base = SCRAMJET_PREFIX.endsWith('/') ? SCRAMJET_PREFIX : `${SCRAMJET_PREFIX}/`;
     const src = `${base}${encodeURIComponent(smartlinkUrl)}`;
     setFrameSrc(src);
-    setFallback(false);
     setLoaded(false);
-
-    // 3) Fallback if blocked or slow
-    const id = window.setTimeout(() => {
-      if (!loaded) setFallback(true);
-    }, AD_IFRAME_TIMEOUT_MS);
-    return () => window.clearTimeout(id);
+    // Fallback disabled: always prefer iframe
+    return () => {};
   }, [shouldRender, smartlinkUrl]);
 
   return (
     <div ref={containerRef} className={cn("relative overflow-hidden", className)}>
-      {!shouldRender ? null : fallback ? (
-        <div className="w-full h-full flex items-center justify-center bg-card/60 border border-border/40 rounded-xl">
-          <div className="text-center px-3 py-2">
-            <div className="text-xs uppercase opacity-70">Sponsored</div>
-            <button
-              className="mt-2 text-sm px-3 py-1 rounded-md bg-primary/80 hover:bg-primary text-white shadow"
-              onClick={() => {
-                const base = SCRAMJET_PREFIX.endsWith('/') ? SCRAMJET_PREFIX : `${SCRAMJET_PREFIX}/`;
-                const u = `${base}${encodeURIComponent(smartlinkUrl)}`;
-                window.open(u, "_blank", "noopener");
-              }}
-            >
-              Visit
-            </button>
-          </div>
-        </div>
-      ) : (
+      {!shouldRender ? null : (
         <iframe
           src={frameSrc}
           className="w-full h-full border-0"
