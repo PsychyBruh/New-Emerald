@@ -107,6 +107,22 @@ const useSettings = create<SettingsStore>()(
     }),
     {
       name: "settings",
+      version: 2,
+      migrate: (persisted: any, version: number) => {
+        try {
+          // Ensure DuckDuckGo is the default for existing users (one-time migration)
+          if (version < 2) {
+            if (!persisted || typeof persisted !== 'object') return persisted;
+            persisted.searchEngine = {
+              name: "DuckDuckgo",
+              url: "https://duckduckgo.com/?q=",
+            };
+          }
+        } catch {
+          // ignore and proceed with existing state
+        }
+        return persisted;
+      },
     }
   )
 );
