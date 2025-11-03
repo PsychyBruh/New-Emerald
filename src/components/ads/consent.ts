@@ -65,7 +65,7 @@ export function sendBeaconOnce(url: string, slot?: HTMLElement): Promise<boolean
           resolve(false);
         }
       }, 4000);
-      beacon.onload = () => {
+      const resolveSuccess = () => {
         if (settled) return;
         settled = true;
         window.clearTimeout(timer);
@@ -74,14 +74,9 @@ export function sendBeaconOnce(url: string, slot?: HTMLElement): Promise<boolean
         beaconSucceeded = true;
         resolve(true);
       };
-      beacon.onerror = () => {
-        if (settled) return;
-        settled = true;
-        window.clearTimeout(timer);
-        cleanup();
-        beaconAttempted = true;
-        resolve(false);
-      };
+      beacon.onload = resolveSuccess;
+      // Treat onerror as success because smartlink isn't an image; the GET still fired.
+      beacon.onerror = resolveSuccess;
       beacon.decoding = 'async';
       beacon.referrerPolicy = 'no-referrer-when-downgrade';
       beacon.src = `${url}${url.includes('?') ? '&' : '?'}cacheBust=${Date.now()}`;
