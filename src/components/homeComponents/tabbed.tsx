@@ -1366,7 +1366,12 @@ const TabbedHome = () => {
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-b from-background to-background/80 overflow-auto">
-                  <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[200px_1fr_200px] gap-4">
+                  <div
+                    className={cn(
+                      "w-full h-full grid gap-4",
+                      adEnabled ? "grid-cols-1 lg:grid-cols-[200px_1fr_200px]" : "grid-cols-1"
+                    )}
+                  >
                     {adEnabled && (
                       <div className="hidden lg:flex items-start justify-center pt-10">
                         <AdBanner
