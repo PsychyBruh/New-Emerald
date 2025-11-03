@@ -757,6 +757,48 @@ const TabbedHome = () => {
   const tabBarRef = useRef<HTMLDivElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
   const settingsStore = useSettings();
+  const [adRefreshSeq, setAdRefreshSeq] = useState(0);
+  const [cooldownMs, setCooldownMs] = useState(0);
+  const cooldownTimer = useRef<number | null>(null);
+  const [adEnabled, setAdEnabled] = useState<boolean>(() => (typeof window !== 'undefined' ? getAdConsent() === 'granted' : false));
+
+  const fmt = (ms: number) => {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${m}:${r.toString().padStart(2, '0')}`;
+  };
+
+  const handleRefreshAds = () => {
+    if (cooldownMs > 0) return;
+    setAdRefreshSeq((v) => v + 1);
+    const delay = Math.floor(45000 + Math.random() * (90000 - 45000));
+    setCooldownMs(delay);
+    if (cooldownTimer.current) window.clearInterval(cooldownTimer.current);
+    cooldownTimer.current = window.setInterval(() => {
+      setCooldownMs((v) => {
+        const n = v - 1000;
+        if (n <= 0) {
+          if (cooldownTimer.current) window.clearInterval(cooldownTimer.current);
+          cooldownTimer.current = null;
+          return 0;
+        }
+        return n;
+      });
+    }, 1000);
+  };
+
+  useEffect(() => () => { if (cooldownTimer.current) window.clearInterval(cooldownTimer.current); }, []);
+
+  useEffect(() => {
+    const onChanged = () => setAdEnabled(getAdConsent() === 'granted');
+    window.addEventListener('supportAds:changed', onChanged as EventListener);
+    window.addEventListener('storage', onChanged);
+    return () => {
+      window.removeEventListener('supportAds:changed', onChanged as EventListener);
+      window.removeEventListener('storage', onChanged);
+    };
+  }, []);
 
 
   const handleBookmarkClick = (bookmark: Bookmark) => {
@@ -1325,12 +1367,15 @@ const TabbedHome = () => {
               ) : (
                 <div className="w-full h-full bg-gradient-to-b from-background to-background/80 overflow-auto">
                   <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[200px_1fr_200px] gap-4">
-                    <div className="hidden lg:flex items-start justify-center pt-10">
-                      <AdBanner
-                        smartlinkUrl={SMARTLINK_URL}
-                        className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
-                      />
-                    </div>
+                    {adEnabled && (
+                      <div className="hidden lg:flex items-start justify-center pt-10">
+                        <AdBanner
+                          key={`left-${adRefreshSeq}`}
+                          smartlinkUrl={SMARTLINK_URL}
+                          className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
+                        />
+                      </div>
+                    )}
                     <div className="col-span-1 flex flex-col items-center justify-start pt-20 relative">
                       <GridPattern
                         width={40}
@@ -1419,12 +1464,32 @@ const TabbedHome = () => {
                         />
                       </a>
                     </div>
-                    <div className="hidden lg:flex items-start justify-center pt-10">
-                      <AdBanner
-                        smartlinkUrl={SMARTLINK_URL}
-                        className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
-                      />
-                    </div>
+                    {adEnabled && (
+                      <div className="hidden lg:flex items-start justify-center pt-10">
+                        <AdBanner
+                          key={`right-${adRefreshSeq}`}
+                          smartlinkUrl={SMARTLINK_URL}
+                          className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
+                        />
+                      </div>
+                    )}
+                    {/* Refresh Ads Button (bottom center) */}
+                    {adEnabled && (
+                      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+                        <button
+                          onClick={handleRefreshAds}
+                          disabled={cooldownMs > 0}
+                          className={`px-3 py-1 rounded-full text-xs border shadow backdrop-blur-md ${
+                            cooldownMs > 0
+                              ? 'bg-muted/60 border-border/40 opacity-70 cursor-not-allowed'
+                              : 'bg-card/70 hover:bg-card/90 border-border/40'
+                          }`}
+                          title={cooldownMs > 0 ? `Next in ${fmt(cooldownMs)}` : 'Refresh ads'}
+                        >
+                          {cooldownMs > 0 ? `Refreshing in ${fmt(cooldownMs)}` : 'Refresh Ads'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

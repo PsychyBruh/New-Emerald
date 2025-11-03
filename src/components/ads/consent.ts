@@ -43,21 +43,57 @@ export function openSupportAdsModal(): void {
 
 // Guards against multiple beacons per pageload
 let beaconSent = false;
-export function sendBeaconOnce(url: string, slot?: HTMLElement): void {
-  if (beaconSent) return;
-  try {
-    const beacon = new Image();
-    beacon.decoding = 'async';
-    beacon.referrerPolicy = 'no-referrer-when-downgrade';
-    beacon.src = `${url}${url.includes('?') ? '&' : '?'}cacheBust=${Date.now()}`;
-    if (slot) {
-      beacon.width = 1;
-      beacon.height = 1;
-      beacon.style.position = 'absolute';
-      beacon.style.opacity = '0';
-      slot.appendChild(beacon);
-    }
-  } catch {}
-  beaconSent = true;
-}
+let beaconAttempted = false;
+let beaconSucceeded = false;
 
+export function sendBeaconOnce(url: string, slot?: HTMLElement): Promise<boolean> {
+  // If we've already had a successful beacon this pageload, don't ping again.
+  if (beaconSucceeded) return Promise.resolve(true);
+
+  return new Promise<boolean>((resolve) => {
+    try {
+      const beacon = new Image();
+      let settled = false;
+      const cleanup = () => {
+        beacon.onload = null;
+        beacon.onerror = null;
+      };
+      const timer = window.setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          cleanup();
+          resolve(false);
+        }
+      }, 4000);
+      beacon.onload = () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        cleanup();
+        beaconAttempted = true;
+        beaconSucceeded = true;
+        resolve(true);
+      };
+      beacon.onerror = () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        cleanup();
+        beaconAttempted = true;
+        resolve(false);
+      };
+      beacon.decoding = 'async';
+      beacon.referrerPolicy = 'no-referrer-when-downgrade';
+      beacon.src = `${url}${url.includes('?') ? '&' : '?'}cacheBust=${Date.now()}`;
+      if (slot) {
+        beacon.width = 1;
+        beacon.height = 1;
+        beacon.style.position = 'absolute';
+        beacon.style.opacity = '0';
+        slot.appendChild(beacon);
+      }
+    } catch {
+      resolve(false);
+    }
+  });
+}

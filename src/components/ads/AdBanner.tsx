@@ -13,6 +13,7 @@ const AdBanner = ({ smartlinkUrl = SMARTLINK_URL, className }: AdBannerProps) =>
   const [shouldRender, setShouldRender] = useState(false);
   const [frameSrc, setFrameSrc] = useState<string>("");
   const [loaded, setLoaded] = useState(false);
+  const [beaconStatus, setBeaconStatus] = useState<'pending' | 'ok' | 'failed'>('pending');
 
   // Consent reactive
   useEffect(() => {
@@ -31,20 +32,34 @@ const AdBanner = ({ smartlinkUrl = SMARTLINK_URL, className }: AdBannerProps) =>
   useEffect(() => {
     if (!shouldRender) return;
     const slot = containerRef.current || undefined;
-    // 1) Beacon first
-    sendBeaconOnce(smartlinkUrl, slot);
-    // 2) Scramjet iframe next
-    const base = SCRAMJET_PREFIX.endsWith('/') ? SCRAMJET_PREFIX : `${SCRAMJET_PREFIX}/`;
-    const src = `${base}${encodeURIComponent(smartlinkUrl)}`;
-    setFrameSrc(src);
-    setLoaded(false);
+    // 1) Beacon first and gate rendering on success
+    setBeaconStatus('pending');
+    (async () => {
+      const ok = await sendBeaconOnce(smartlinkUrl, slot);
+      if (!ok) {
+        setBeaconStatus('failed');
+        return;
+      }
+      setBeaconStatus('ok');
+      // 2) Scramjet iframe next
+      const base = SCRAMJET_PREFIX.endsWith('/') ? SCRAMJET_PREFIX : `${SCRAMJET_PREFIX}/`;
+      const src = `${base}${encodeURIComponent(smartlinkUrl)}`;
+      setFrameSrc(src);
+      setLoaded(false);
+    })();
     // Fallback disabled: always prefer iframe
     return () => {};
   }, [shouldRender, smartlinkUrl]);
 
+  if (!shouldRender) return null;
+
   return (
     <div ref={containerRef} className={cn("relative overflow-hidden", className)}>
-      {!shouldRender ? null : (
+      {beaconStatus === 'failed' ? (
+        <div className="w-full h-full flex items-center justify-center text-xs opacity-80">
+          Ad failed
+        </div>
+      ) : beaconStatus === 'ok' ? (
         <iframe
           src={frameSrc}
           className="w-full h-full border-0"
@@ -53,7 +68,7 @@ const AdBanner = ({ smartlinkUrl = SMARTLINK_URL, className }: AdBannerProps) =>
           title="Sponsored"
           onLoad={() => setLoaded(true)}
         />
-      )}
+      ) : null}
     </div>
   );
 };
