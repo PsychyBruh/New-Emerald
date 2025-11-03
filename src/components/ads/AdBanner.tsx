@@ -35,7 +35,8 @@ const AdBanner = ({ smartlinkUrl = SMARTLINK_URL, className }: AdBannerProps) =>
     // 1) Beacon first
     sendBeaconOnce(smartlinkUrl, slot);
     // 2) Scramjet iframe next
-    const src = `${SCRAMJET_PREFIX.replace(/\/$/, "")}/b/s/${smartlinkUrl}`;
+    const base = SCRAMJET_PREFIX.endsWith('/') ? SCRAMJET_PREFIX : `${SCRAMJET_PREFIX}/`;
+    const src = `${base}${encodeURIComponent(smartlinkUrl)}`;
     setFrameSrc(src);
     setFallback(false);
     setLoaded(false);
@@ -55,7 +56,11 @@ const AdBanner = ({ smartlinkUrl = SMARTLINK_URL, className }: AdBannerProps) =>
             <div className="text-xs uppercase opacity-70">Sponsored</div>
             <button
               className="mt-2 text-sm px-3 py-1 rounded-md bg-primary/80 hover:bg-primary text-white shadow"
-              onClick={() => window.open(`${SCRAMJET_PREFIX}/b/s/${smartlinkUrl}`, "_blank", "noopener")}
+              onClick={() => {
+                const base = SCRAMJET_PREFIX.endsWith('/') ? SCRAMJET_PREFIX : `${SCRAMJET_PREFIX}/`;
+                const u = `${base}${encodeURIComponent(smartlinkUrl)}`;
+                window.open(u, "_blank", "noopener");
+              }}
             >
               Visit
             </button>
