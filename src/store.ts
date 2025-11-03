@@ -50,8 +50,8 @@ const DEFAULT_SETTINGS: SettingValues = {
   title: "Emerald ✨",
   icon: "/emerald.png",
   searchEngine: {
-    name: "Google",
-    url: "https://google.com/search?q=",
+    name: "DuckDuckgo",
+    url: "https://duckduckgo.com/?q=",
   },
   wispUrl: `${location.protocol.includes("https") ? "wss://" : "ws://"}${
     location.host
@@ -87,8 +87,8 @@ const useSettings = create<SettingsStore>()(
       icon: "/emerald.png",
       setIcon: (icon: string) => set(() => ({ icon })),
       searchEngine: {
-        name: "Brave",
-        url: "https://search.brave.com/search?q=",
+        name: "DuckDuckgo",
+        url: "https://duckduckgo.com/?q=",
       },
       // defaults to current websites wisp url
       wispUrl: `${location.protocol.includes("https") ? "wss://" : "ws://"}${
