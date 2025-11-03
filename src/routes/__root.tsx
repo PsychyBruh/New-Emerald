@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { VERSION } from "@/constants";
 import { toast } from "sonner";
 import SupportAdsManager from "@/components/ads/SupportAdsManager";
+import ConsolePanel from "@/components/devtools/ConsolePanel";
 const TanStackRouterDevtools =
   process.env.NODE_ENV === "production"
     ? () => null // Render nothing in production
@@ -67,6 +68,7 @@ function RenderComponent() {
         <TanStackRouterDevtools />
       </Suspense>
       <SupportAdsManager />
+      <ConsolePanel />
     </>
   );
 }
