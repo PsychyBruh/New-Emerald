@@ -36,8 +36,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Obfuscate } from "../obf";
-import NativeBanner from "../ads/NativeBanner";
-import { VERSION, AD_NATIVE_CONTAINER_ID, AD_NATIVE_INVOKE_URL } from "@/constants";
+import Banner160x600 from "../ads/Banner160x600";
+import { VERSION } from "@/constants";
 import { openSupportAdsModal, setAdConsent, getAdConsent } from "@/components/ads/consent";
 interface Tab {
   id: string;
@@ -1581,11 +1581,9 @@ const TabbedHome = () => {
                   >
                     {showAdColumns && (
                       <div className="hidden lg:flex items-start justify-center pt-10">
-                        <NativeBanner
+                        <Banner160x600
                           key={`left-${adRefreshSeq}`}
-                          invokeUrl={AD_NATIVE_INVOKE_URL}
-                          containerId={AD_NATIVE_CONTAINER_ID}
-                          className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
+                          className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl shadow-lg"
                         />
                       </div>
                     )}
@@ -1679,11 +1677,9 @@ const TabbedHome = () => {
                     </div>
                     {showAdColumns && (
                       <div className="hidden lg:flex items-start justify-center pt-10">
-                        <NativeBanner
+                        <Banner160x600
                           key={`right-${adRefreshSeq}`}
-                          invokeUrl={AD_NATIVE_INVOKE_URL}
-                          containerId={AD_NATIVE_CONTAINER_ID}
-                          className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
+                          className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl shadow-lg"
                         />
                       </div>
                     )}

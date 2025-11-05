@@ -14,8 +14,7 @@ import { useMeta } from "../hooks/useMeta";
 import { AnimatePresence, motion } from "framer-motion";
 import GridPattern from "../ui/grid-pattern";
 import PopularSites from "../../sites.json";
-import NativeBanner from "../ads/NativeBanner";
-import { AD_NATIVE_CONTAINER_ID, AD_NATIVE_INVOKE_URL } from "@/constants";
+import Banner160x600 from "../ads/Banner160x600";
 import { openSupportAdsModal, setAdConsent, getAdConsent } from "@/components/ads/consent";
 import {
   DropdownMenu,
@@ -212,11 +211,9 @@ const DefaultHome = () => {
         className={`w-full h-screen ${shouldOpen ? "" : "hidden"} z-20`}
       ></iframe>
       {!shouldOpen && (
-        <NativeBanner
-          invokeUrl={AD_NATIVE_INVOKE_URL}
-          containerId={AD_NATIVE_CONTAINER_ID}
+        <Banner160x600
           className={cn(
-            "fixed left-4 top-1/2 z-[60] hidden h-[600px] w-40 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg transition-opacity duration-300 lg:flex"
+            "fixed left-4 top-1/2 z-[60] hidden h-[600px] w-40 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl shadow-lg transition-opacity duration-300 lg:flex"
           )}
         />
       )}
