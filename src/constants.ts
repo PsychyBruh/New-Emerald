@@ -11,4 +11,4 @@ export const SCRAMJET_PREFIX = "/~/scramjet/";
 export const AD_IFRAME_TIMEOUT_MS = 3500;
 
 // Temporary flag to hide visible ad iframes/cards while keeping consent + beacon flow.
-export const SHOW_AD_IFRAME = false;
+export const SHOW_AD_IFRAME = true;
