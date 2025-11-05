@@ -26,3 +26,22 @@ export async function loadScriptViaScramjet(url: string): Promise<boolean> {
   }
 }
 
+export async function injectScriptTagProxied(url: string): Promise<boolean> {
+  try {
+    const base = SCRAMJET_PREFIX.endsWith('/') ? SCRAMJET_PREFIX : `${SCRAMJET_PREFIX}/`;
+    const proxied = `${base}${encodeURIComponent(url)}`;
+    await new Promise<void>((resolve, reject) => {
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.src = proxied;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('script load error'));
+      document.head.appendChild(s);
+    });
+    return true;
+  } catch (e) {
+    console.warn('Ad script tag load failed', e);
+    return false;
+  }
+}

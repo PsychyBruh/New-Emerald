@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { getAdConsent, sendBeaconOnce } from './consent';
-import { loadScriptViaScramjet } from './inject';
+import { loadScriptViaScramjet, injectScriptTagProxied } from './inject';
 import { AD_SOCIALBAR_URL } from '@/constants';
 import { useSettings } from '@/store';
 
@@ -9,13 +9,15 @@ export default function SocialBarLoader() {
   const settings = useSettings();
 
   useEffect(() => {
+    const ssKey = 'ads:socialbar:loaded';
     const maybeLoad = async () => {
       if (loadedRef.current) return;
       if (!settings.enableSocialBar) return;
       if (getAdConsent() !== 'granted') return;
-      const ssKey = 'ads:socialbar:loaded';
       if (sessionStorage.getItem(ssKey) === '1') return;
-      const ok = await loadScriptViaScramjet(AD_SOCIALBAR_URL);
+      // Prefer script tag with src through Scramjet proxy
+      let ok = await injectScriptTagProxied(AD_SOCIALBAR_URL);
+      if (!ok) ok = await loadScriptViaScramjet(AD_SOCIALBAR_URL);
       if (ok) {
         loadedRef.current = true;
         sessionStorage.setItem(ssKey, '1');
@@ -30,4 +32,3 @@ export default function SocialBarLoader() {
 
   return null;
 }
-
