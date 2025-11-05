@@ -37,7 +37,7 @@ import {
 } from "../ui/select";
 import { Obfuscate } from "../obf";
 import AdBanner from "../ads/AdBanner";
-import { VERSION, SMARTLINK_URL } from "@/constants";
+import { VERSION, SMARTLINK_URL, SHOW_AD_IFRAME } from "@/constants";
 import { openSupportAdsModal, setAdConsent, getAdConsent } from "@/components/ads/consent";
 interface Tab {
   id: string;
@@ -798,7 +798,12 @@ const TabbedHome = () => {
   const [cooldownMs, setCooldownMs] = useState(0);
   const cooldownTimer = useRef<number | null>(null);
   const [adEnabled, setAdEnabled] = useState<boolean>(() => (typeof window !== 'undefined' ? getAdConsent() === 'granted' : false));
+  const showAdColumns = adEnabled && SHOW_AD_IFRAME;
   const autoTimer = useRef<number | null>(null);
+  const [nextAutoMs, setNextAutoMs] = useState(0);
+  const nextAutoInterval = useRef<number | null>(null);
+  const [adInView, setAdInView] = useState(false);
+  const [autoPaused, setAutoPaused] = useState(false);
 
   const fmt = (ms: number) => {
     const s = Math.max(0, Math.ceil(ms / 1000));
@@ -827,6 +832,8 @@ const TabbedHome = () => {
   };
 
   const autoRefreshTick = () => {
+    // Visual toast notification top-right
+    try { toast.info('Refreshing ads...', { position: 'top-right' } as any); } catch {}
     setAdRefreshSeq((v) => v + 1);
     const delay = Math.floor(45000 + Math.random() * (90000 - 45000));
     setCooldownMs(delay);
@@ -856,27 +863,74 @@ const TabbedHome = () => {
     };
   }, []);
 
+  // Observe ad slot visibility (>=50% in view enables refreshing)
+  useEffect(() => {
+    if (!adEnabled) { setAdInView(false); return; }
+    const slots = Array.from(document.querySelectorAll('[data-ad-slot]')) as HTMLElement[];
+    if (slots.length === 0) { setAdInView(false); return; }
+    const io = new IntersectionObserver((entries) => {
+      const anyVisible = entries.some((e) => e.isIntersecting && e.intersectionRatio >= 0.5);
+      setAdInView(anyVisible);
+    }, { threshold: [0, 0.5, 1] });
+    slots.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [showAdColumns, adRefreshSeq]);
+
+  // Pause when hidden or not in view
+  useEffect(() => {
+    const compute = () => setAutoPaused(document.hidden || !adInView);
+    compute();
+    const onVis = () => compute();
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, [adInView]);
+
   // Auto refresh ads on randomized cadence when enabled
   useEffect(() => {
     if (autoTimer.current) {
       window.clearTimeout(autoTimer.current);
       autoTimer.current = null;
     }
-    if (!adEnabled || !settingsStore.autoRefreshAds) return;
+    if (nextAutoInterval.current) {
+      window.clearInterval(nextAutoInterval.current);
+      nextAutoInterval.current = null;
+    }
+    if (!showAdColumns || !settingsStore.autoRefreshAds) return;
     const scheduleNext = () => {
       const delay = Math.floor(45000 + Math.random() * (90000 - 45000));
-      autoTimer.current = window.setTimeout(() => {
+      setNextAutoMs(delay);
+      if (nextAutoInterval.current) window.clearInterval(nextAutoInterval.current);
+      nextAutoInterval.current = window.setInterval(() => {
+        setNextAutoMs((v) => {
+          if (autoPaused) return v; // freeze countdown while paused
+          const n = v - 1000;
+          if (n <= 0) {
+            if (nextAutoInterval.current) window.clearInterval(nextAutoInterval.current);
+            nextAutoInterval.current = null;
+            return 0;
+          }
+          return n;
+        });
+      }, 1000);
+      const onFire = () => {
+        if (autoPaused) {
+          autoTimer.current = window.setTimeout(onFire, 1000);
+          return;
+        }
         autoRefreshTick();
         scheduleNext();
-      }, delay);
+      };
+      autoTimer.current = window.setTimeout(onFire, delay);
     };
     scheduleNext();
     return () => {
       if (autoTimer.current) window.clearTimeout(autoTimer.current);
       autoTimer.current = null;
+      if (nextAutoInterval.current) window.clearInterval(nextAutoInterval.current);
+      nextAutoInterval.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adEnabled, settingsStore.autoRefreshAds]);
+  }, [showAdColumns, settingsStore.autoRefreshAds, autoPaused]);
 
 
   const handleBookmarkClick = (bookmark: Bookmark) => {
@@ -1447,10 +1501,10 @@ const TabbedHome = () => {
                   <div
                     className={cn(
                       "w-full h-full grid gap-4",
-                      adEnabled ? "grid-cols-1 lg:grid-cols-[200px_1fr_200px]" : "grid-cols-1"
+                      showAdColumns ? "grid-cols-1 lg:grid-cols-[200px_1fr_200px]" : "grid-cols-1"
                     )}
                   >
-                    {adEnabled && (
+                    {showAdColumns && (
                       <div className="hidden lg:flex items-start justify-center pt-10">
                         <AdBanner
                           key={`left-${adRefreshSeq}`}
@@ -1547,7 +1601,7 @@ const TabbedHome = () => {
                         />
                       </a>
                     </div>
-                    {adEnabled && (
+                    {showAdColumns && (
                       <div className="hidden lg:flex items-start justify-center pt-10">
                         <AdBanner
                           key={`right-${adRefreshSeq}`}
@@ -1557,19 +1611,31 @@ const TabbedHome = () => {
                       </div>
                     )}
                     {/* Refresh Ads Button (bottom center) */}
-                    {adEnabled && (
+                    {showAdColumns && (
                       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
                         <button
-                          onClick={handleRefreshAds}
-                          disabled={cooldownMs > 0}
+                          onClick={settingsStore.autoRefreshAds ? undefined : handleRefreshAds}
+                          disabled={settingsStore.autoRefreshAds ? true : cooldownMs > 0}
                           className={`px-3 py-1 rounded-full text-xs border shadow backdrop-blur-md ${
-                            cooldownMs > 0
+                            settingsStore.autoRefreshAds || cooldownMs > 0
                               ? 'bg-muted/60 border-border/40 opacity-70 cursor-not-allowed'
                               : 'bg-card/70 hover:bg-card/90 border-border/40'
                           }`}
-                          title={cooldownMs > 0 ? `Next in ${fmt(cooldownMs)}` : 'Refresh ads'}
+                          title={settingsStore.autoRefreshAds
+                            ? autoPaused
+                              ? 'Auto refresh paused'
+                              : `Next auto in ${fmt(nextAutoMs)}`
+                            : cooldownMs > 0
+                              ? `Next in ${fmt(cooldownMs)}`
+                              : 'Refresh ads'}
                         >
-                          {cooldownMs > 0 ? `Refreshing in ${fmt(cooldownMs)}` : 'Refresh Ads'}
+                          {settingsStore.autoRefreshAds
+                            ? autoPaused
+                              ? 'Paused'
+                              : `Refreshing in ${fmt(nextAutoMs)}`
+                            : cooldownMs > 0
+                              ? `Refreshing in ${fmt(cooldownMs)}`
+                              : 'Refresh Ads'}
                         </button>
                       </div>
                     )}

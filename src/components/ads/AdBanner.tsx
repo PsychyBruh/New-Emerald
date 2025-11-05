@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { AD_IFRAME_TIMEOUT_MS, SCRAMJET_PREFIX, SMARTLINK_URL } from "@/constants";
+import { AD_IFRAME_TIMEOUT_MS, SCRAMJET_PREFIX, SMARTLINK_URL, SHOW_AD_IFRAME } from "@/constants";
 import { getAdConsent, sendBeaconOnce } from "./consent";
 
 type AdBannerProps = {
@@ -51,10 +51,10 @@ const AdBanner = ({ smartlinkUrl = SMARTLINK_URL, className }: AdBannerProps) =>
     return () => {};
   }, [shouldRender, smartlinkUrl]);
 
-  if (!shouldRender) return null;
+  if (!shouldRender || !SHOW_AD_IFRAME) return null;
 
   return (
-    <div ref={containerRef} className={cn("relative overflow-hidden", className)}>
+    <div ref={containerRef} data-ad-slot className={cn("relative overflow-hidden", className)}>
       {beaconStatus === 'failed' ? (
         <div className="w-full h-full flex items-center justify-center text-xs opacity-80">
           Ad failed

@@ -15,7 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import GridPattern from "../ui/grid-pattern";
 import PopularSites from "../../sites.json";
 import AdBanner from "../ads/AdBanner";
-import { SMARTLINK_URL } from "@/constants";
+import { SMARTLINK_URL, SHOW_AD_IFRAME } from "@/constants";
 import { openSupportAdsModal, setAdConsent, getAdConsent } from "@/components/ads/consent";
 import {
   DropdownMenu,
@@ -211,7 +211,7 @@ const DefaultHome = () => {
         ref={frame}
         className={`w-full h-screen ${shouldOpen ? "" : "hidden"} z-20`}
       ></iframe>
-      {!shouldOpen && (
+      {!shouldOpen && SHOW_AD_IFRAME && (
         <AdBanner
           smartlinkUrl={SMARTLINK_URL}
           className={cn(

@@ -9,7 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { getAdConsent, setAdConsent, shouldPromptForConsent } from './consent';
+import { getAdConsent, setAdConsent, shouldPromptForConsent, sendBeaconOnce } from './consent';
+import { SMARTLINK_URL } from '@/constants';
 import { useSettings } from '@/store';
 
 export default function SupportAdsManager() {
@@ -24,6 +25,32 @@ export default function SupportAdsManager() {
     const onOpen = () => setOpen(true);
     window.addEventListener('supportAds:open', onOpen as EventListener);
     return () => window.removeEventListener('supportAds:open', onOpen as EventListener);
+  }, []);
+
+  // If ads already enabled but auto-refresh choice hasn't been asked, ask once
+  useEffect(() => {
+    try {
+      const consent = getAdConsent();
+      const asked = localStorage.getItem('autoRefreshAsked') === '1';
+      if (consent === 'granted' && !settings.autoRefreshAds && !asked) {
+        // delay slightly so UI is ready
+        setTimeout(() => setOpenAuto(true), 100);
+      }
+    } catch {}
+
+    const onChanged = (e: any) => {
+      try {
+        const status = e?.detail?.status ?? getAdConsent();
+        const asked = localStorage.getItem('autoRefreshAsked') === '1';
+        if (status === 'granted' && !settings.autoRefreshAds && !asked) {
+          try { sendBeaconOnce(SMARTLINK_URL); } catch {}
+          setTimeout(() => setOpenAuto(true), 50);
+        }
+      } catch {}
+    };
+    window.addEventListener('supportAds:changed', onChanged as EventListener);
+    return () => window.removeEventListener('supportAds:changed', onChanged as EventListener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -56,6 +83,7 @@ export default function SupportAdsManager() {
             </AlertDialogCancel>
             <AlertDialogAction onClick={() => {
               setAdConsent('granted');
+              try { sendBeaconOnce(SMARTLINK_URL); } catch {}
               setOpen(false);
               setTimeout(() => setOpenAuto(true), 50);
             }}>
@@ -75,10 +103,10 @@ export default function SupportAdsManager() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => { settings.setAutoRefreshAds(false); setOpenAuto(false); }}>
+            <AlertDialogCancel onClick={() => { settings.setAutoRefreshAds(false); try { localStorage.setItem('autoRefreshAsked','1'); } catch {}; setOpenAuto(false); }}>
               No thanks
             </AlertDialogCancel>
-            <AlertDialogAction onClick={() => { settings.setAutoRefreshAds(true); setOpenAuto(false); }}>
+            <AlertDialogAction onClick={() => { settings.setAutoRefreshAds(true); try { localStorage.setItem('autoRefreshAsked','1'); } catch {}; setOpenAuto(false); }}>
               Enable Auto Refresh
             </AlertDialogAction>
           </AlertDialogFooter>
