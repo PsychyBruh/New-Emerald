@@ -796,6 +796,10 @@ const TabbedHome = () => {
   const tabBarRef = useRef<HTMLDivElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
   const settingsStore = useSettings();
+  const tabsRef = useRef(tabs);
+  useEffect(() => {
+    tabsRef.current = tabs;
+  }, [tabs]);
   const [adRefreshSeq, setAdRefreshSeq] = useState(0);
   const [cooldownMs, setCooldownMs] = useState(0);
   const cooldownTimer = useRef<number | null>(null);
@@ -972,6 +976,49 @@ const TabbedHome = () => {
       toast.error("No active tab or the current tab is a internal tab.");
     }
   };
+
+  // Decode proxied iframe URL to real target (no encoded / proxy prefix in UI)
+  const decodeProxiedUrl = (href: string): string | null => {
+    try {
+      const u = new URL(href, window.location.origin);
+      const m = u.pathname.match(/^\/~\/(uv|scramjet)\/(.+)$/);
+      if (!m) return null;
+      const encoded = m[2];
+      const target = decodeURIComponent(encoded);
+      // Basic validation
+      if (/^https?:\/\//i.test(target)) return target;
+      return target;
+    } catch {
+      return null;
+    }
+  };
+
+  // Periodically sync each tab's URL from its iframe location without exposing encoded proxy URLs
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      const currentTabs = tabsRef.current;
+      let changed = false;
+      const nextTabs = currentTabs.map((tab) => {
+        const el = iframeRefs.current[tab.id];
+        if (!el) return tab;
+        try {
+          const href = el.contentWindow?.location.href;
+          if (!href) return tab;
+          const decoded = decodeProxiedUrl(href);
+          if (decoded && decoded !== tab.url) {
+            if (tab.isActive && document.activeElement !== urlInputRef.current) {
+              setInputUrl(decoded);
+            }
+            changed = true;
+            return { ...tab, url: decoded };
+          }
+        } catch {}
+        return tab;
+      });
+      if (changed) setTabs(nextTabs);
+    }, 800);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
