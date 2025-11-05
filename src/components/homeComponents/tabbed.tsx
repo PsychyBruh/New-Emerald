@@ -36,8 +36,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Obfuscate } from "../obf";
-import AdBanner from "../ads/AdBanner";
-import { VERSION, SMARTLINK_URL, SHOW_AD_IFRAME } from "@/constants";
+import NativeBanner from "../ads/NativeBanner";
+import { VERSION, AD_NATIVE_CONTAINER_ID, AD_NATIVE_INVOKE_URL } from "@/constants";
 import { openSupportAdsModal, setAdConsent, getAdConsent } from "@/components/ads/consent";
 interface Tab {
   id: string;
@@ -425,6 +425,81 @@ const SettingsPage = () => {
                         number of ads displayed.
                       </p>
                     </div>
+
+                    <Separator className="bg-border/20" />
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                        <span className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          7
+                        </span>
+                        Popunder
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
+                          onClick={() => { if (window.confirm('Enable Popunder?')) settingsStore.setEnablePopunder(true); }}
+                        >
+                          Enable
+                        </button>
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
+                          onClick={() => { if (window.confirm('Disable Popunder?')) settingsStore.setEnablePopunder(false); }}
+                        >
+                          Disable
+                        </button>
+                      </div>
+                    </div>
+
+                    <Separator className="bg-border/20" />
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                        <span className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          8
+                        </span>
+                        Social Bar
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
+                          onClick={() => { if (window.confirm('Enable Social Bar?')) settingsStore.setEnableSocialBar(true); }}
+                        >
+                          Enable
+                        </button>
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
+                          onClick={() => { if (window.confirm('Disable Social Bar?')) settingsStore.setEnableSocialBar(false); }}
+                        >
+                          Disable
+                        </button>
+                      </div>
+                    </div>
+
+                    <Separator className="bg-border/20" />
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                        <span className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          9
+                        </span>
+                        Native Banner
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
+                          onClick={() => { if (window.confirm('Enable Native Banner?')) settingsStore.setEnableNativeBanner(true); }}
+                        >
+                          Enable
+                        </button>
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
+                          onClick={() => { if (window.confirm('Disable Native Banner?')) settingsStore.setEnableNativeBanner(false); }}
+                        >
+                          Disable
+                        </button>
+                      </div>
+                    </div>
                     <Separator className="bg-border/20" />
 
                     <div>
@@ -798,7 +873,7 @@ const TabbedHome = () => {
   const [cooldownMs, setCooldownMs] = useState(0);
   const cooldownTimer = useRef<number | null>(null);
   const [adEnabled, setAdEnabled] = useState<boolean>(() => (typeof window !== 'undefined' ? getAdConsent() === 'granted' : false));
-  const showAdColumns = adEnabled && SHOW_AD_IFRAME;
+  const showAdColumns = adEnabled && settingsStore.enableNativeBanner;
   const autoTimer = useRef<number | null>(null);
   const [nextAutoMs, setNextAutoMs] = useState(0);
   const nextAutoInterval = useRef<number | null>(null);
@@ -1506,9 +1581,10 @@ const TabbedHome = () => {
                   >
                     {showAdColumns && (
                       <div className="hidden lg:flex items-start justify-center pt-10">
-                        <AdBanner
+                        <NativeBanner
                           key={`left-${adRefreshSeq}`}
-                          smartlinkUrl={SMARTLINK_URL}
+                          invokeUrl={AD_NATIVE_INVOKE_URL}
+                          containerId={AD_NATIVE_CONTAINER_ID}
                           className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
                         />
                       </div>
@@ -1603,9 +1679,10 @@ const TabbedHome = () => {
                     </div>
                     {showAdColumns && (
                       <div className="hidden lg:flex items-start justify-center pt-10">
-                        <AdBanner
+                        <NativeBanner
                           key={`right-${adRefreshSeq}`}
-                          smartlinkUrl={SMARTLINK_URL}
+                          invokeUrl={AD_NATIVE_INVOKE_URL}
+                          containerId={AD_NATIVE_CONTAINER_ID}
                           className="h-[600px] w-40 rounded-2xl border border-border/40 bg-card/70 p-4 backdrop-blur-xl shadow-lg"
                         />
                       </div>

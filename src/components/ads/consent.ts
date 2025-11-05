@@ -42,8 +42,6 @@ export function openSupportAdsModal(): void {
 }
 
 // Guards against multiple beacons per pageload
-let beaconSent = false;
-let beaconAttempted = false;
 let beaconSucceeded = false;
 
 export function sendBeaconOnce(url: string, slot?: HTMLElement): Promise<boolean> {
@@ -70,7 +68,6 @@ export function sendBeaconOnce(url: string, slot?: HTMLElement): Promise<boolean
         settled = true;
         window.clearTimeout(timer);
         cleanup();
-        beaconAttempted = true;
         beaconSucceeded = true;
         resolve(true);
       };

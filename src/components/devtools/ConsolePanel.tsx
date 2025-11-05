@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 type LogLevel = 'log' | 'info' | 'warn' | 'error' | 'debug' | 'trace' | 'group' | 'groupCollapsed' | 'groupEnd';
@@ -51,12 +51,12 @@ function useConsoleCapture(onEntry: (e: LogEntry) => void) {
     };
 
     const wrap = (key: keyof typeof console, level: LogLevel) => {
-      // @ts-expect-error dynamic
+      // @ts-ignore dynamic
       orig[level] = console[key].bind(console);
-      // @ts-expect-error dynamic
+      // @ts-ignore dynamic
       console[key] = (...args: any[]) => {
         capture(level, args);
-        // @ts-expect-error dynamic
+        // @ts-ignore dynamic
         orig[level]?.(...args);
         if (level === 'group' || level === 'groupCollapsed') groupLevelRef.current += 1;
         if (level === 'groupEnd') groupLevelRef.current = Math.max(0, groupLevelRef.current - 1);
@@ -71,49 +71,49 @@ function useConsoleCapture(onEntry: (e: LogEntry) => void) {
     wrap('trace', 'trace');
 
     // Group APIs
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     orig.group = console.group?.bind(console) ?? ((...a: any[]) => {});
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     console.group = (...args: any[]) => {
       capture('group', args);
-      // @ts-expect-error dynamic
+      // @ts-ignore dynamic
       orig.group?.(...args);
       groupLevelRef.current += 1;
     };
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     orig.groupCollapsed = console.groupCollapsed?.bind(console) ?? ((...a: any[]) => {});
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     console.groupCollapsed = (...args: any[]) => {
       capture('groupCollapsed', args);
-      // @ts-expect-error dynamic
+      // @ts-ignore dynamic
       orig.groupCollapsed?.(...args);
       groupLevelRef.current += 1;
     };
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     orig.groupEnd = console.groupEnd?.bind(console) ?? ((...a: any[]) => {});
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     console.groupEnd = (...args: any[]) => {
       capture('groupEnd', args);
       groupLevelRef.current = Math.max(0, groupLevelRef.current - 1);
-      // @ts-expect-error dynamic
+      // @ts-ignore dynamic
       orig.groupEnd?.(...args);
     };
 
     // Map dir/table to log-style entries
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     orig.dir = console.dir?.bind(console) ?? ((...a: any[]) => {});
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     console.dir = (...args: any[]) => {
       capture('log', ['[dir]', ...args]);
-      // @ts-expect-error dynamic
+      // @ts-ignore dynamic
       orig.dir?.(...args);
     };
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     orig.table = console.table?.bind(console) ?? ((...a: any[]) => {});
-    // @ts-expect-error dynamic
+    // @ts-ignore dynamic
     console.table = (...args: any[]) => {
       capture('log', ['[table]', ...args]);
-      // @ts-expect-error dynamic
+      // @ts-ignore dynamic
       orig.table?.(...args);
     };
 
@@ -142,7 +142,7 @@ function safeFormat(arg: any): string {
     if (typeof arg === 'function') return `[Function ${arg.name || 'anonymous'}]`;
     if (typeof arg === 'number' || typeof arg === 'boolean' || arg == null) return String(arg);
     const seen = new WeakSet();
-    return JSON.stringify(arg, (k, v) => {
+    return JSON.stringify(arg, (_k, v) => {
       if (typeof v === 'object' && v !== null) {
         if (seen.has(v)) return '[Circular]';
         seen.add(v);
@@ -313,4 +313,3 @@ export default function ConsolePanel() {
     </div>
   );
 }
-
