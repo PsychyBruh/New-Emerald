@@ -7,8 +7,6 @@ import { VERSION } from "@/constants";
 import { toast } from "sonner";
 import SupportAdsManager from "@/components/ads/SupportAdsManager";
 import ConsolePanel from "@/components/devtools/ConsolePanel";
-import PopunderLoader from "@/components/ads/PopunderLoader";
-import SocialBarLoader from "@/components/ads/SocialBarLoader";
 const TanStackRouterDevtools =
   process.env.NODE_ENV === "production"
     ? () => null // Render nothing in production
@@ -70,8 +68,6 @@ function RenderComponent() {
         <TanStackRouterDevtools />
       </Suspense>
       <SupportAdsManager />
-      <PopunderLoader />
-      <SocialBarLoader />
       <ConsolePanel />
     </>
   );

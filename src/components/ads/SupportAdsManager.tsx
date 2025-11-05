@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { getAdConsent, setAdConsent, shouldPromptForConsent, sendBeaconOnce } from './consent';
+import { getAdConsent, setAdConsent, shouldPromptForConsent } from './consent';
 import { useSettings } from '@/store';
 
 export default function SupportAdsManager() {
@@ -42,7 +42,6 @@ export default function SupportAdsManager() {
         const status = e?.detail?.status ?? getAdConsent();
         const asked = localStorage.getItem('autoRefreshAsked') === '1';
         if (status === 'granted' && !settings.autoRefreshAds && !asked) {
-          try { sendBeaconOnce('/api/ads/ping?tag=ads-enabled'); } catch {}
           setTimeout(() => setOpenAuto(true), 50);
         }
       } catch {}
@@ -82,7 +81,6 @@ export default function SupportAdsManager() {
             </AlertDialogCancel>
             <AlertDialogAction onClick={() => {
               setAdConsent('granted');
-              try { sendBeaconOnce('/api/ads/ping?tag=ads-enabled'); } catch {}
               setOpen(false);
               setTimeout(() => setOpenAuto(true), 50);
             }}>

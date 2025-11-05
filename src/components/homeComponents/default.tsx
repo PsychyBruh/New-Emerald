@@ -14,7 +14,7 @@ import { useMeta } from "../hooks/useMeta";
 import { AnimatePresence, motion } from "framer-motion";
 import GridPattern from "../ui/grid-pattern";
 import PopularSites from "../../sites.json";
-import Banner160x600 from "../ads/Banner160x600";
+import AdBanner from "../ads/AdBanner";
 import { openSupportAdsModal, setAdConsent, getAdConsent } from "@/components/ads/consent";
 import {
   DropdownMenu,
@@ -211,7 +211,7 @@ const DefaultHome = () => {
         className={`w-full h-screen ${shouldOpen ? "" : "hidden"} z-20`}
       ></iframe>
       {!shouldOpen && (
-        <Banner160x600
+        <AdBanner
           className={cn(
             "fixed left-4 top-1/2 z-[60] hidden h-[600px] w-40 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-border/40 bg-card/70 backdrop-blur-xl shadow-lg transition-opacity duration-300 lg:flex"
           )}
@@ -704,57 +704,6 @@ const DefaultHome = () => {
                       title={`Current: ${getAdConsent() ?? 'unset'}`}
                     >
                       Manage
-                    </button>
-                  </div>
-                </div>
-                <div className="flex justify-between px-4 items-center">
-                  <h3 className="text-xl font-medium">Popunder</h3>
-                  <div className="w-[40%] flex items-center justify-end space-x-2">
-                    <button
-                      className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
-                      onClick={() => { if (window.confirm('Enable Popunder?')) settingStore.setEnablePopunder(true); }}
-                    >
-                      Enable
-                    </button>
-                    <button
-                      className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
-                      onClick={() => { if (window.confirm('Disable Popunder?')) settingStore.setEnablePopunder(false); }}
-                    >
-                      Disable
-                    </button>
-                  </div>
-                </div>
-                <div className="flex justify-between px-4 items-center">
-                  <h3 className="text-xl font-medium">Social Bar</h3>
-                  <div className="w-[40%] flex items-center justify-end space-x-2">
-                    <button
-                      className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
-                      onClick={() => { if (window.confirm('Enable Social Bar?')) settingStore.setEnableSocialBar(true); }}
-                    >
-                      Enable
-                    </button>
-                    <button
-                      className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
-                      onClick={() => { if (window.confirm('Disable Social Bar?')) settingStore.setEnableSocialBar(false); }}
-                    >
-                      Disable
-                    </button>
-                  </div>
-                </div>
-                <div className="flex justify-between px-4 items-center">
-                  <h3 className="text-xl font-medium">Native Banner</h3>
-                  <div className="w-[40%] flex items-center justify-end space-x-2">
-                    <button
-                      className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
-                      onClick={() => { if (window.confirm('Enable Native Banner?')) settingStore.setEnableNativeBanner(true); }}
-                    >
-                      Enable
-                    </button>
-                    <button
-                      className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
-                      onClick={() => { if (window.confirm('Disable Native Banner?')) settingStore.setEnableNativeBanner(false); }}
-                    >
-                      Disable
                     </button>
                   </div>
                 </div>

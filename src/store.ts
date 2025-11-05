@@ -19,9 +19,6 @@ interface SettingValues {
   wispUrl: string;
   allowTabReordering: boolean;
   autoRefreshAds: boolean;
-  enablePopunder: boolean;
-  enableSocialBar: boolean;
-  enableNativeBanner: boolean;
 }
 
 interface SettingSetters {
@@ -40,9 +37,6 @@ interface SettingSetters {
   setDefault: () => void;
   setAllowTabReordering: (allow: boolean) => void;
   setAutoRefreshAds: (on: boolean) => void;
-  setEnablePopunder: (on: boolean) => void;
-  setEnableSocialBar: (on: boolean) => void;
-  setEnableNativeBanner: (on: boolean) => void;
 }
 
 const DEFAULT_SETTINGS: SettingValues = {
@@ -65,9 +59,6 @@ const DEFAULT_SETTINGS: SettingValues = {
     location.host
   }/w/`,
   autoRefreshAds: false,
-  enablePopunder: true,
-  enableSocialBar: true,
-  enableNativeBanner: true,
 };
 
 type SettingsStore = SettingValues & SettingSetters;
@@ -117,17 +108,11 @@ const useSettings = create<SettingsStore>()(
         })),
       autoRefreshAds: false,
       setAutoRefreshAds: (on: boolean) => set(() => ({ autoRefreshAds: on })),
-      enablePopunder: true,
-      setEnablePopunder: (on: boolean) => set(() => ({ enablePopunder: on })),
-      enableSocialBar: true,
-      setEnableSocialBar: (on: boolean) => set(() => ({ enableSocialBar: on })),
-      enableNativeBanner: true,
-      setEnableNativeBanner: (on: boolean) => set(() => ({ enableNativeBanner: on })),
       setDefault: () => set(() => DEFAULT_SETTINGS),
     }),
     {
       name: "settings",
-      version: 4,
+      version: 3,
       migrate: (persisted: any, version: number) => {
         try {
           // Ensure DuckDuckGo is the default for existing users (one-time migration)
@@ -144,12 +129,7 @@ const useSettings = create<SettingsStore>()(
               persisted.autoRefreshAds = false;
             }
           }
-          if (version < 4) {
-            if (!persisted || typeof persisted !== 'object') return persisted;
-            if (typeof persisted.enablePopunder !== 'boolean') persisted.enablePopunder = true;
-            if (typeof persisted.enableSocialBar !== 'boolean') persisted.enableSocialBar = true;
-            if (typeof persisted.enableNativeBanner !== 'boolean') persisted.enableNativeBanner = true;
-          }
+          // version 4 fields removed; no-op
         } catch {
           // ignore and proceed with existing state
         }

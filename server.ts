@@ -92,13 +92,7 @@ app.get("/api/sponser", async (req, res) => {
 });
 
 // Lightweight ads telemetry endpoint (no PII, no URLs)
-app.get("/api/ads/ping", async (req, res) => {
-  try {
-    const tag = (req.query as any)?.tag ?? "unknown";
-    console.log(`[ADS] ping tag=${tag} @ ${Date.now()}`);
-  } catch {}
-  res.status(204).send();
-});
+
 
 app.post("/api/chat", async (req, res) => {
   const { messages, model } = req.body as ChatPayload;
