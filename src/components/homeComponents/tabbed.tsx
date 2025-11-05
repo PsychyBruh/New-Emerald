@@ -45,6 +45,7 @@ interface Tab {
   url: string;
   favicon?: string;
   isActive: boolean;
+  displayUrl?: string;
 }
 
 interface Bookmark {
@@ -796,6 +797,7 @@ const TabbedHome = () => {
   const tabBarRef = useRef<HTMLDivElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
   const settingsStore = useSettings();
+  const lastActiveIdRef = useRef<string | null>(null);
   const tabsRef = useRef(tabs);
   useEffect(() => {
     tabsRef.current = tabs;
@@ -977,6 +979,18 @@ const TabbedHome = () => {
     }
   };
 
+  // Sync URL input when switching active tabs (without overwriting while typing)
+  useEffect(() => {
+    const active = tabs.find((t) => t.isActive);
+    const activeId = active?.id || null;
+    if (activeId !== lastActiveIdRef.current) {
+      lastActiveIdRef.current = activeId;
+      if (active && document.activeElement !== urlInputRef.current) {
+        setInputUrl(active.displayUrl || active.url || '');
+      }
+    }
+  }, [tabs]);
+
   // Decode proxied iframe URL to real target (no encoded / proxy prefix in UI)
   const decodeProxiedUrl = (href: string): string | null => {
     try {
@@ -993,7 +1007,7 @@ const TabbedHome = () => {
     }
   };
 
-  // Periodically sync each tab's URL from its iframe location without exposing encoded proxy URLs
+  // Periodically sync each tab's visible URL/title/favicon from its iframe location without exposing encoded proxy URLs
   useEffect(() => {
     const id = window.setInterval(() => {
       const currentTabs = tabsRef.current;
@@ -1005,13 +1019,37 @@ const TabbedHome = () => {
           const href = el.contentWindow?.location.href;
           if (!href) return tab;
           const decoded = decodeProxiedUrl(href);
-          if (decoded && decoded !== tab.url) {
+          // Read title & favicon from the proxied document (same-origin under /~/...)
+          const doc = el.contentDocument;
+          const newTitle = doc?.title || tab.title;
+          let newIcon = tab.favicon;
+          try {
+            const linkIcon = doc?.querySelector(
+              "link[rel*='icon'], link[rel='shortcut icon'], link[rel='apple-touch-icon']"
+            ) as HTMLLinkElement | null;
+            if (linkIcon?.href) {
+              const base = decoded || tab.url;
+              newIcon = new URL(linkIcon.href, base).toString();
+            }
+          } catch {}
+
+          let next = tab;
+          if (decoded) {
             if (tab.isActive && document.activeElement !== urlInputRef.current) {
               setInputUrl(decoded);
             }
-            changed = true;
-            return { ...tab, url: decoded };
+            if (decoded !== tab.displayUrl) {
+              next = { ...next, displayUrl: decoded };
+            }
           }
+          if (newTitle && newTitle !== tab.title) {
+            next = { ...next, title: newTitle };
+          }
+          if (newIcon && newIcon !== tab.favicon) {
+            next = { ...next, favicon: newIcon };
+          }
+          if (next !== tab) changed = true;
+          return next;
         } catch {}
         return tab;
       });

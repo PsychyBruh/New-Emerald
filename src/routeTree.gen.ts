@@ -10,33 +10,79 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as PlayRouteImport } from './routes/play'
-import { Route as GamesRouteImport } from './routes/games'
-import { Route as IndexRouteImport } from './routes/index'
+// Import Routes
 
-const ChatLazyRouteImport = createFileRoute('/chat')()
+import { Route as rootRoute } from './routes/__root'
+import { Route as PlayImport } from './routes/play'
+import { Route as GamesImport } from './routes/games'
+import { Route as IndexImport } from './routes/index'
 
-const ChatLazyRoute = ChatLazyRouteImport.update({
+// Create Virtual Routes
+
+const ChatLazyImport = createFileRoute('/chat')()
+
+// Create/Update Routes
+
+const ChatLazyRoute = ChatLazyImport.update({
   id: '/chat',
   path: '/chat',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/chat.lazy').then((d) => d.Route))
-const PlayRoute = PlayRouteImport.update({
+
+const PlayRoute = PlayImport.update({
   id: '/play',
   path: '/play',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRoute,
 } as any)
-const GamesRoute = GamesRouteImport.update({
+
+const GamesRoute = GamesImport.update({
   id: '/games',
   path: '/games',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRoute,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootRoute,
 } as any)
+
+// Populate the FileRoutesByPath interface
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/games': {
+      id: '/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof GamesImport
+      parentRoute: typeof rootRoute
+    }
+    '/play': {
+      id: '/play'
+      path: '/play'
+      fullPath: '/play'
+      preLoaderRoute: typeof PlayImport
+      parentRoute: typeof rootRoute
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatLazyImport
+      parentRoute: typeof rootRoute
+    }
+  }
+}
+
+// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -44,19 +90,22 @@ export interface FileRoutesByFullPath {
   '/play': typeof PlayRoute
   '/chat': typeof ChatLazyRoute
 }
+
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/games': typeof GamesRoute
   '/play': typeof PlayRoute
   '/chat': typeof ChatLazyRoute
 }
+
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
+  __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/games': typeof GamesRoute
   '/play': typeof PlayRoute
   '/chat': typeof ChatLazyRoute
 }
+
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/games' | '/play' | '/chat'
@@ -65,44 +114,12 @@ export interface FileRouteTypes {
   id: '__root__' | '/' | '/games' | '/play' | '/chat'
   fileRoutesById: FileRoutesById
 }
+
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GamesRoute: typeof GamesRoute
   PlayRoute: typeof PlayRoute
   ChatLazyRoute: typeof ChatLazyRoute
-}
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/chat': {
-      id: '/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof ChatLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/play': {
-      id: '/play'
-      path: '/play'
-      fullPath: '/play'
-      preLoaderRoute: typeof PlayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/games': {
-      id: '/games'
-      path: '/games'
-      fullPath: '/games'
-      preLoaderRoute: typeof GamesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -111,6 +128,35 @@ const rootRouteChildren: RootRouteChildren = {
   PlayRoute: PlayRoute,
   ChatLazyRoute: ChatLazyRoute,
 }
-export const routeTree = rootRouteImport
+
+export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+/* ROUTE_MANIFEST_START
+{
+  "routes": {
+    "__root__": {
+      "filePath": "__root.tsx",
+      "children": [
+        "/",
+        "/games",
+        "/play",
+        "/chat"
+      ]
+    },
+    "/": {
+      "filePath": "index.tsx"
+    },
+    "/games": {
+      "filePath": "games.tsx"
+    },
+    "/play": {
+      "filePath": "play.tsx"
+    },
+    "/chat": {
+      "filePath": "chat.lazy.tsx"
+    }
+  }
+}
+ROUTE_MANIFEST_END */
