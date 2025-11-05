@@ -323,13 +323,17 @@ const SettingsPage = () => {
                       <div className="flex items-center gap-2">
                         <button
                           className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
-                          onClick={() => setAdConsent('granted')}
+                          onClick={() => {
+                            if (window.confirm('Enable ads?')) setAdConsent('granted');
+                          }}
                         >
                           Enable
                         </button>
                         <button
                           className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
-                          onClick={() => setAdConsent('denied')}
+                          onClick={() => {
+                            if (window.confirm('Disable ads?')) setAdConsent('denied');
+                          }}
                         >
                           Disable
                         </button>
@@ -388,6 +392,39 @@ const SettingsPage = () => {
                       </p>
                     </div>
 
+                    <Separator className="bg-border/20" />
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+                        <span className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          6
+                        </span>
+                        Auto Refresh Ads
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
+                          onClick={() => {
+                            if (window.confirm('Enable auto refresh ads? This may increase the amount of ads you view.'))
+                              settingsStore.setAutoRefreshAds(true);
+                          }}
+                        >
+                          Enable
+                        </button>
+                        <button
+                          className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
+                          onClick={() => {
+                            if (window.confirm('Disable auto refresh ads?')) settingsStore.setAutoRefreshAds(false);
+                          }}
+                        >
+                          Disable
+                        </button>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2 ml-8">
+                        Refreshes ads automatically every 45–90 seconds (random). May increase the
+                        number of ads displayed.
+                      </p>
+                    </div>
                     <Separator className="bg-border/20" />
 
                     <div>
@@ -761,6 +798,7 @@ const TabbedHome = () => {
   const [cooldownMs, setCooldownMs] = useState(0);
   const cooldownTimer = useRef<number | null>(null);
   const [adEnabled, setAdEnabled] = useState<boolean>(() => (typeof window !== 'undefined' ? getAdConsent() === 'granted' : false));
+  const autoTimer = useRef<number | null>(null);
 
   const fmt = (ms: number) => {
     const s = Math.max(0, Math.ceil(ms / 1000));
@@ -771,6 +809,24 @@ const TabbedHome = () => {
 
   const handleRefreshAds = () => {
     if (cooldownMs > 0) return;
+    setAdRefreshSeq((v) => v + 1);
+    const delay = Math.floor(45000 + Math.random() * (90000 - 45000));
+    setCooldownMs(delay);
+    if (cooldownTimer.current) window.clearInterval(cooldownTimer.current);
+    cooldownTimer.current = window.setInterval(() => {
+      setCooldownMs((v) => {
+        const n = v - 1000;
+        if (n <= 0) {
+          if (cooldownTimer.current) window.clearInterval(cooldownTimer.current);
+          cooldownTimer.current = null;
+          return 0;
+        }
+        return n;
+      });
+    }, 1000);
+  };
+
+  const autoRefreshTick = () => {
     setAdRefreshSeq((v) => v + 1);
     const delay = Math.floor(45000 + Math.random() * (90000 - 45000));
     setCooldownMs(delay);
@@ -799,6 +855,28 @@ const TabbedHome = () => {
       window.removeEventListener('storage', onChanged);
     };
   }, []);
+
+  // Auto refresh ads on randomized cadence when enabled
+  useEffect(() => {
+    if (autoTimer.current) {
+      window.clearTimeout(autoTimer.current);
+      autoTimer.current = null;
+    }
+    if (!adEnabled || !settingsStore.autoRefreshAds) return;
+    const scheduleNext = () => {
+      const delay = Math.floor(45000 + Math.random() * (90000 - 45000));
+      autoTimer.current = window.setTimeout(() => {
+        autoRefreshTick();
+        scheduleNext();
+      }, delay);
+    };
+    scheduleNext();
+    return () => {
+      if (autoTimer.current) window.clearTimeout(autoTimer.current);
+      autoTimer.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adEnabled, settingsStore.autoRefreshAds]);
 
 
   const handleBookmarkClick = (bookmark: Bookmark) => {

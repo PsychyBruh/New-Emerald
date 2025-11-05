@@ -686,13 +686,17 @@ const DefaultHome = () => {
                   <div className="w-[40%] flex items-center justify-end space-x-2">
                     <button
                       className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
-                      onClick={() => setAdConsent('granted')}
+                      onClick={() => {
+                        if (window.confirm('Enable ads?')) setAdConsent('granted');
+                      }}
                     >
                       Enable
                     </button>
                     <button
                       className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
-                      onClick={() => setAdConsent('denied')}
+                      onClick={() => {
+                        if (window.confirm('Disable ads?')) setAdConsent('denied');
+                      }}
                     >
                       Disable
                     </button>
@@ -702,6 +706,28 @@ const DefaultHome = () => {
                       title={`Current: ${getAdConsent() ?? 'unset'}`}
                     >
                       Manage
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-between px-4 items-center">
+                  <h3 className="text-xl font-medium">Auto Refresh Ads</h3>
+                  <div className="w-[40%] flex items-center justify-end space-x-2">
+                    <button
+                      className="px-3 py-1 rounded-md text-sm bg-primary/80 hover:bg-primary text-white"
+                      onClick={() => {
+                        if (window.confirm('Enable auto refresh ads? This may increase the amount of ads you view.'))
+                          settingStore.setAutoRefreshAds(true);
+                      }}
+                    >
+                      Enable
+                    </button>
+                    <button
+                      className="px-3 py-1 rounded-md text-sm bg-muted/70 hover:bg-muted text-foreground"
+                      onClick={() => {
+                        if (window.confirm('Disable auto refresh ads?')) settingStore.setAutoRefreshAds(false);
+                      }}
+                    >
+                      Disable
                     </button>
                   </div>
                 </div>

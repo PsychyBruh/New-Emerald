@@ -18,6 +18,7 @@ interface SettingValues {
   };
   wispUrl: string;
   allowTabReordering: boolean;
+  autoRefreshAds: boolean;
 }
 
 interface SettingSetters {
@@ -35,6 +36,7 @@ interface SettingSetters {
   setSearchEngine: (name: string, url: string) => void;
   setDefault: () => void;
   setAllowTabReordering: (allow: boolean) => void;
+  setAutoRefreshAds: (on: boolean) => void;
 }
 
 const DEFAULT_SETTINGS: SettingValues = {
@@ -56,6 +58,7 @@ const DEFAULT_SETTINGS: SettingValues = {
   wispUrl: `${location.protocol.includes("https") ? "wss://" : "ws://"}${
     location.host
   }/w/`,
+  autoRefreshAds: false,
 };
 
 type SettingsStore = SettingValues & SettingSetters;
@@ -103,11 +106,13 @@ const useSettings = create<SettingsStore>()(
             url,
           },
         })),
+      autoRefreshAds: false,
+      setAutoRefreshAds: (on: boolean) => set(() => ({ autoRefreshAds: on })),
       setDefault: () => set(() => DEFAULT_SETTINGS),
     }),
     {
       name: "settings",
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version: number) => {
         try {
           // Ensure DuckDuckGo is the default for existing users (one-time migration)
@@ -117,6 +122,12 @@ const useSettings = create<SettingsStore>()(
               name: "DuckDuckgo",
               url: "https://duckduckgo.com/?q=",
             };
+          }
+          if (version < 3) {
+            if (!persisted || typeof persisted !== 'object') return persisted;
+            if (typeof persisted.autoRefreshAds !== 'boolean') {
+              persisted.autoRefreshAds = false;
+            }
           }
         } catch {
           // ignore and proceed with existing state
