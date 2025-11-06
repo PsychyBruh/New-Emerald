@@ -58,7 +58,7 @@ const DEFAULT_SETTINGS: SettingValues = {
   wispUrl: `${location.protocol.includes("https") ? "wss://" : "ws://"}${
     location.host
   }/w/`,
-  autoRefreshAds: false,
+  autoRefreshAds: true,
 };
 
 type SettingsStore = SettingValues & SettingSetters;
@@ -106,13 +106,13 @@ const useSettings = create<SettingsStore>()(
             url,
           },
         })),
-      autoRefreshAds: false,
+      autoRefreshAds: true,
       setAutoRefreshAds: (on: boolean) => set(() => ({ autoRefreshAds: on })),
       setDefault: () => set(() => DEFAULT_SETTINGS),
     }),
     {
       name: "settings",
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version: number) => {
         try {
           // Ensure DuckDuckGo is the default for existing users (one-time migration)
@@ -129,7 +129,10 @@ const useSettings = create<SettingsStore>()(
               persisted.autoRefreshAds = false;
             }
           }
-          // version 4 fields removed; no-op
+          if (version < 4) {
+            if (!persisted || typeof persisted !== 'object') return persisted;
+            persisted.autoRefreshAds = true;
+          }
         } catch {
           // ignore and proceed with existing state
         }
