@@ -1,4 +1,4 @@
-export const VERSION = "1.0.4";
+export const VERSION = "1.0.5";
 
 // Smartlink used for support ads (Adsterra)
 export const SMARTLINK_URL = "https://otieu.com/4/10128847";
