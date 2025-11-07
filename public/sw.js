@@ -4,11 +4,14 @@ importScripts("/uv/uv.bundle.js");
 importScripts("/uv/uv.sw.js");
 importScripts("/uv/uv.config.js");
 
-// Strictly use the new bundle for testing (no legacy fallback)
+// Scramjet bundle shim
+try { self.unknown = self.unknown || {}; } catch (e) {}
+// Strictly use the new bundle (no legacy fallback)
 importScripts(
-  "/new-scram/scramjet.all.js?v=2",
-  "/new-scram/scramjet.sync.js?v=2"
+  "/new-scram/scramjet.all.js?v=3",
+  "/new-scram/scramjet.sync.js?v=3"
 );
+try { console.info('[scramjet] new bundle imported (v=3)'); } catch(e) {}
 
 uv = new UVServiceWorker();
 const scramjet = new ScramjetServiceWorker();

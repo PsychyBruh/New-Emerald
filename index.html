@@ -17,15 +17,19 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Scramjet bundle shim: prevent ReferenceError if bundle expects a global
+      if (typeof window.unknown === 'undefined') window.unknown = {};
+    </script>
     <script src="/scram/scramjet.controller.js"></script>
     <script>
       const scramjet = new ScramjetController({
         prefix: "/~/scramjet/",
         files: {
-          // Strictly use the new bundle for testing (no legacy fallback)
-          bundle: "/new-scram/scramjet.all.js?v=2",
-          wasm: "/new-scram/8da5bafa191877bf.wasm?v=2",
-          sync: "/new-scram/scramjet.sync.js?v=2",
+          // Strictly use the new bundle (no legacy fallback)
+          bundle: "/new-scram/scramjet.all.js?v=3",
+          wasm: "/new-scram/8da5bafa191877bf.wasm?v=3",
+          sync: "/new-scram/scramjet.sync.js?v=3",
         },
       });
       window.sj = scramjet;
