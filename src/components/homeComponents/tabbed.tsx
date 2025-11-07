@@ -798,18 +798,7 @@ const TabbedHome = () => {
   const urlInputRef = useRef<HTMLInputElement>(null);
   const settingsStore = useSettings();
   const lastActiveIdRef = useRef<string | null>(null);
-  // Ensure UV uses Epoxy transport for tougher CDNs (zstd/br)
-  const ensureEpoxyForUV = () => {
-    try {
-      // @ts-ignore runtime check
-      const conn = (window as any).Connection;
-      if (conn && settingsStore.transport.name !== 'epoxy') {
-        conn.setTransport('/epoxy/index.mjs', [
-          { wisp: settingsStore.wispUrl },
-        ]);
-      }
-    } catch {}
-  };
+  
   const tabsRef = useRef(tabs);
   useEffect(() => {
     tabsRef.current = tabs;
@@ -968,14 +957,7 @@ const TabbedHome = () => {
       const activeTabId = updatedTabs[activeTabIndex].id;
       if (iframeRefs.current[activeTabId]) {
         const encodedUrl = encodeURIComponent(bookmark.url);
-        const pickProxy = (() => {
-          try {
-            const h = new URL(bookmark.url).hostname;
-            if (h.endsWith('ldrescdn.com') || h.includes('easyfun')) { ensureEpoxyForUV(); return 'uv'; }
-          } catch {}
-          return settingsStore.proxy;
-        })();
-        iframeRefs.current[activeTabId]!.src = `/~/${pickProxy}/${encodedUrl}`;
+        iframeRefs.current[activeTabId]!.src = `/~/${settingsStore.proxy}/${encodedUrl}`;
       }
     }
   };
@@ -1417,14 +1399,7 @@ const TabbedHome = () => {
       if (iframeRefs.current[activeTabId]) {
         const encodedUrl = encodeURIComponent(processedUrl);
         // Choose proxy: fall back to UV for domains that break under scramjet/libcurl (e.g., ldrescdn/easyfun)
-        const pickProxy = (() => {
-          try {
-            const h = new URL(processedUrl).hostname;
-            if (h.endsWith('ldrescdn.com') || h.includes('easyfun')) { ensureEpoxyForUV(); return 'uv'; }
-          } catch {}
-          return settingsStore.proxy;
-        })();
-        iframeRefs.current[activeTabId]!.src = `/~/${pickProxy}/${encodedUrl}`;
+        iframeRefs.current[activeTabId]!.src = `/~/${settingsStore.proxy}/${encodedUrl}`;
       }
     }
   };
