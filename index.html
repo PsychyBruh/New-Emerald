@@ -22,11 +22,10 @@
       const scramjet = new ScramjetController({
         prefix: "/~/scramjet/",
         files: {
-          wasm: "/scram/scramjet.wasm.wasm",
-          worker: "/scram/scramjet.worker.js",
-          client: "/scram/scramjet.client.js",
-          shared: "/scram/scramjet.shared.js",
-          sync: "/scram/scramjet.sync.js",
+          // Strictly use the new bundle for testing (no legacy fallback)
+          bundle: "/new-scram/scramjet.all.js?v=2",
+          wasm: "/new-scram/8da5bafa191877bf.wasm?v=2",
+          sync: "/new-scram/scramjet.sync.js?v=2",
         },
       });
       window.sj = scramjet;

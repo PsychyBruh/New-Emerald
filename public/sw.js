@@ -4,10 +4,10 @@ importScripts("/uv/uv.bundle.js");
 importScripts("/uv/uv.sw.js");
 importScripts("/uv/uv.config.js");
 
+// Strictly use the new bundle for testing (no legacy fallback)
 importScripts(
-  "/scram/scramjet.wasm.js",
-  "/scram/scramjet.shared.js",
-  "/scram/scramjet.worker.js"
+  "/new-scram/scramjet.all.js?v=2",
+  "/new-scram/scramjet.sync.js?v=2"
 );
 
 uv = new UVServiceWorker();
