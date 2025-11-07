@@ -6,12 +6,28 @@ importScripts("/uv/uv.config.js");
 
 // Scramjet bundle shim
 try { self.unknown = self.unknown || {}; } catch (e) {}
-// Strictly use the new bundle (no legacy fallback)
-importScripts(
-  "/new-scram/scramjet.all.js?v=3",
-  "/new-scram/scramjet.sync.js?v=3"
-);
-try { console.info('[scramjet] new bundle imported (v=3)'); } catch(e) {}
+// Prefer new bundle; if it doesn't expose ScramjetServiceWorker (packaging diff), fall back to legacy pieces
+try {
+  importScripts(
+    "/new-scram/scramjet.all.js?v=3",
+    "/new-scram/scramjet.sync.js?v=3"
+  );
+  try { console.info('[scramjet] new bundle imported (v=3)'); } catch(e) {}
+} catch (e) {
+  try { console.warn('[scramjet] failed to import new bundle, falling back to legacy', e); } catch(_) {}
+}
+if (typeof self.ScramjetServiceWorker !== 'function') {
+  try {
+    importScripts(
+      "/scram/scramjet.wasm.js",
+      "/scram/scramjet.shared.js",
+      "/scram/scramjet.worker.js"
+    );
+    try { console.info('[scramjet] legacy worker imported'); } catch(e) {}
+  } catch (e) {
+    try { console.error('[scramjet] failed to import legacy worker', e); } catch(_) {}
+  }
+}
 
 uv = new UVServiceWorker();
 const scramjet = new ScramjetServiceWorker();

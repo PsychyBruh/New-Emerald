@@ -956,7 +956,15 @@ const TabbedHome = () => {
 
       const activeTabId = updatedTabs[activeTabIndex].id;
       if (iframeRefs.current[activeTabId]) {
-        const encodedUrl = encodeURIComponent(bookmark.url);
+        const target = (() => {
+          try {
+            const url = new URL(bookmark.url);
+            const h = url.hostname.toLowerCase();
+            if (h === "instagram.com") { url.hostname = "www.instagram.com"; return url.toString(); }
+          } catch {}
+          return bookmark.url;
+        })();
+        const encodedUrl = encodeURIComponent(target);
         iframeRefs.current[activeTabId]!.src = `/~/${settingsStore.proxy}/${encodedUrl}`;
       }
     }
@@ -1377,6 +1385,21 @@ const TabbedHome = () => {
         isSearch = true;
       }
     }
+
+    // Canonicalize hosts that are picky about TLS endpoints (e.g., instagram apex)
+    const canonicalize = (u: string): string => {
+      try {
+        const url = new URL(u);
+        const h = url.hostname.toLowerCase();
+        if (h === "instagram.com") {
+          url.hostname = "www.instagram.com";
+          return url.toString();
+        }
+      } catch {}
+      return u;
+    };
+
+    processedUrl = canonicalize(processedUrl);
 
     const activeTabIndex = tabs.findIndex((tab) => tab.isActive);
     if (activeTabIndex !== -1) {
