@@ -19,7 +19,7 @@ COPY . .
 
 # Run the build script (defined in package.json)
 # This should build the Vite static files (into /dist)
-# We also explicitly compile the server using tsconfig.node.json
+# and compile the server (likely into a /build folder)
 RUN pnpm build && pnpm exec tsc --project tsconfig.node.json
 
 # --- Production Stage ---
@@ -37,9 +37,13 @@ COPY package.json pnpm-lock.yaml ./
 # Install ONLY production dependencies
 RUN pnpm install --prod --frozen-lockfile
 
-# Copy the built application artifacts from the 'builder' stage
-# This assumes 'pnpm build' AND 'tsc' both output to the 'dist' folder
+# Copy the built client-side artifacts from the 'builder' stage
+# This assumes 'pnpm build' (vite) outputs the client to a 'dist' folder
 COPY --from=builder /app/dist ./dist
+
+# Copy the compiled server files from the 'builder' stage
+# This assumes 'tsc' outputs the server to a 'build' folder
+COPY --from=builder /app/build ./build
 
 # Your server.ts likely serves static files from a directory.
 # If 'pnpm build' doesn't move 'public' into 'dist', you may need this line:
@@ -49,6 +53,6 @@ COPY --from=builder /app/dist ./dist
 # 3000 is a common default. Change this if your server uses a different one.
 EXPOSE 3000
 
-# This is the most reliable way to start your app.
-# It directly runs the compiled server file from the dist directory.
-CMD ["node", "dist/server.js"]
+# This runs the compiled server file from the 'build' directory.
+# This assumes the main file is server.js
+CMD ["node", "build/server.js"]
