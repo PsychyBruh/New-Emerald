@@ -50,5 +50,5 @@ COPY --from=builder /app/dist ./dist
 EXPOSE 3000
 
 # This is the most reliable way to start your app.
-# It will run the "start" script defined in your package.json.
-CMD ["pnpm", "start"]
+# It directly runs the compiled server file.
+CMD ["node", "dist/server.js"]
